@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tools Dapxz</title>
+
+<script>
+  (function(){
+    var saved = localStorage.getItem('tools-dev-theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236c8cff'/%3E%3Ctext x='32' y='43' font-family='Arial, sans-serif' font-weight='800' font-size='27' fill='white' text-anchor='middle'%3ETD%3C/text%3E%3C/svg%3E" />
+
+<link rel="stylesheet" href="style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Caveat:wght@600&family=Dancing+Script:wght@700&family=Great+Vibes&family=Herr+Von+Muellerhoff&family=Marck+Script&family=Mrs+Saint+Delafield&family=Pacifico&family=Sacramento&family=Satisfy&family=Yellowtail&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+</head>
+<body>
+
+<div id="splash-screen">
+  <div class="splash-content">
+    <div class="brand-mark splash-logo">TD</div>
+    <div class="splash-title">Tools Dapxz</div>
+    <div class="splash-subtitle">downloader &amp; converter</div>
+  </div>
+</div>
+
+<button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Buka menu"><span id="mobile-menu-icon">☰</span></button>
+<div class="mobile-topbar">
+  <div class="mobile-topbar-brand">
+    <div class="brand-mark">TD</div>
+    <span>Tools Dapxz</span>
+  </div>
+  <button class="mobile-theme-btn" id="mobile-theme-toggle" aria-label="Ganti tema terang/gelap">
+    <span id="mobile-theme-icon">🌙</span>
+  </button>
+</div>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<aside id="sidebar">
+  <div class="brand">
+    <div class="brand-mark">TD</div>
+    <div class="brand-text">
+      <h1>Tools Dapxz</h1>
+      <span>downloader &amp; converter</span>
+    </div>
+    <button class="drawer-close-btn" onclick="closeDrawer()" aria-label="Tutup menu">×</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Downloader</div>
+    <nav class="nav-list" id="nav-downloader">
+      <button class="active" data-id="yt">
+        <span class="nav-icon icon-youtube">
+          <svg viewBox="0 0 28 20" width="18" height="14" xmlns="http://www.w3.org/2000/svg">
+            <path d="M27.4 3.1c-.3-1.2-1.3-2.1-2.5-2.4C22.7 0.2 14 0.2 14 0.2s-8.7 0-10.9.5C1.9 1 .9 1.9.6 3.1 0 5.3 0 10 0 10s0 4.7.6 6.9c.3 1.2 1.3 2.1 2.5 2.4C5.3 19.8 14 19.8 14 19.8s8.7 0 10.9-.5c1.2-.3 2.2-1.2 2.5-2.4.6-2.2.6-6.9.6-6.9s0-4.7-.6-6.9z" fill="#FF0000"/>
+            <path d="M11.2 14.3 18.5 10l-7.3-4.3z" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="nav-label">YouTube Downloader</span>
+      </button>
+      <button data-id="tiktok">
+        <span class="nav-icon icon-tiktok">
+          <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.6 5.82c-1.02-.9-1.66-2.2-1.66-3.63h-3.02v13.94c0 1.63-1.32 2.95-2.95 2.95a2.95 2.95 0 0 1 0-5.9c.31 0 .6.05.88.13V9.9a6 6 0 0 0-.88-.07 5.97 5.97 0 1 0 5.97 5.97V8.1a8.6 8.6 0 0 0 4.5 1.27V6.35a4.85 4.85 0 0 1-2.84-.53z" fill="#25F4EE"/>
+            <path d="M18.06 5.82c-1.02-.9-1.66-2.2-1.66-3.63h-1.44c.34 1.9 1.46 3.52 3.1 4.5v3.28a8.6 8.6 0 0 1-4.5-1.27v6.79a5.97 5.97 0 0 1-9.1 5.08 5.97 5.97 0 0 0 10.4-4.03V8.1a8.6 8.6 0 0 0 4.5 1.27V6.35a4.9 4.9 0 0 1-1.3-.53z" fill="#FE2C55"/>
+          </svg>
+        </span>
+        <span class="nav-label">TikTok Downloader</span>
+      </button>
+      <button data-id="instagram">
+        <span class="nav-icon icon-instagram">
+          <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" stop-color="#FEE411"/>
+                <stop offset="30%" stop-color="#FD5949"/>
+                <stop offset="60%" stop-color="#D6249F"/>
+                <stop offset="100%" stop-color="#285AEB"/>
+              </linearGradient>
+            </defs>
+            <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#igGrad)"/>
+            <circle cx="12" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.8"/>
+            <circle cx="18" cy="6" r="1.3" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="nav-label">Instagram Downloader</span>
+      </button>
+      <button data-id="twitter">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.9 2H22l-7.6 8.7L23.3 22h-6.9l-5.4-7-6.2 7H1.6l8.1-9.3L1 2h7.1l4.9 6.4L18.9 2zm-1.2 18h1.9L7.4 3.9H5.3L17.7 20z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="nav-label">Twitter / X Downloader</span>
+      </button>
+      <button data-id="capcut">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#000"/>
+            <path d="M5 6h4l3 6-3 6H5l3-6-3-6zM19 6h-4l-3 6 3 6h4l-3-6 3-6z" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="nav-label">CapCut Template Downloader</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Converter</div>
+    <nav class="nav-list" id="nav-converter">
+      <button data-id="imgconv">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="3.5" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="5" cy="7" r="1.1" fill="currentColor"/>
+            <path d="M2 11l3-3 2 2 3.5-3.5L13 10" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M15 7h2.5a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </span>
+        <span class="nav-label">Image Converter</span>
+      </button>
+      <button data-id="imgcompress">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="3.5" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="5" cy="7" r="1.1" fill="currentColor"/>
+            <path d="M2 11l3-3 2 2 3.5-3.5L13 10" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M16 5.5v3M16 5.5l-1.6 1.6M16 5.5l1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 14.5v-3M16 14.5l-1.6-1.6M16 14.5l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="nav-label">Compress Image</span>
+      </button>
+      <button data-id="mp4tomp3">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="2.5" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M7.2 4.8v4.4l3.4-2.2z" fill="currentColor"/>
+            <path d="M12 12.5h3.2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+            <path d="M13.4 11l1.8 1.5-1.8 1.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 15.5c0-2 1.2-3.2 2.2-4.2M9 16.3v-3.6M9 12.7c0-1 .8-1.6 1.7-1.6s1.6.6 1.6 1.5-0.8 1.5-1.6 1.5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+            <circle cx="6.3" cy="16.3" r="1.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="nav-label">MP4 ke MP3</span>
+      </button>
+      <button data-id="bgremove">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="5.5" cy="5.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="5.5" cy="14.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M7.2 6.8 17 16.5M17 3.5 10.2 10.2M7.2 13.2 9 11.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav-label">Background Remover</span>
+      </button>
+      <button data-id="img2pdf">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="2" width="9" height="11" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="4.6" cy="5.2" r="0.9" fill="currentColor"/>
+            <path d="M2 11l2.5-2.5 1.8 1.8 2.7-2.7L10.5 11" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M13 6h4.2a0.8 0.8 0 0 1 .8.8V17a0.8 0.8 0 0 1-.8.8H9.8a0.8 0.8 0 0 1-.8-.8v-1.3" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <text x="10.3" y="13.5" font-size="4.5" fill="currentColor" font-weight="700">PDF</text>
+          </svg>
+        </span>
+        <span class="nav-label">Gambar ke PDF</span>
+      </button>
+      <button data-id="pdf2img">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.8" y="2" width="9" height="11" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <text x="2.6" y="9.3" font-size="4.3" fill="currentColor" font-weight="700">PDF</text>
+            <path d="M12 8h4.5" stroke="currentColor" stroke-width="1.3" fill="none"/>
+            <path d="M14.7 5.7 17 8l-2.3 2.3" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="10.5" y="11.5" width="8" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="12.6" cy="13.7" r="0.6" fill="currentColor"/>
+            <path d="M11 17l1.8-1.8 1.2 1.2 2-2 1.5 1.5" fill="none" stroke="currentColor" stroke-width="1.1"/>
+          </svg>
+        </span>
+        <span class="nav-label">PDF ke Gambar</span>
+      </button>
+      <button data-id="pdfcompress">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="2" width="12" height="16" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <text x="4.6" y="9.3" font-size="4.3" fill="currentColor" font-weight="700">PDF</text>
+            <path d="M7 13l1.8 1.8M8.8 13l-1.8 1.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M11 13l1.8 1.8M12.8 13l-1.8 1.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav-label">Kompres PDF</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Generator</div>
+    <nav class="nav-list" id="nav-generator">
+      <button data-id="qrgen">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="6" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="3.6" y="3.6" width="2.8" height="2.8" fill="currentColor"/>
+            <rect x="12" y="2" width="6" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="13.6" y="3.6" width="2.8" height="2.8" fill="currentColor"/>
+            <rect x="2" y="12" width="6" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="3.6" y="13.6" width="2.8" height="2.8" fill="currentColor"/>
+            <rect x="12" y="12" width="2.6" height="2.6" fill="currentColor"/>
+            <rect x="15.4" y="12" width="2.6" height="2.6" fill="currentColor"/>
+            <rect x="12" y="15.4" width="2.6" height="2.6" fill="currentColor"/>
+            <rect x="15.4" y="15.4" width="2.6" height="2.6" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="nav-label">QR Code Generator</span>
+      </button>
+      <button data-id="fontgen">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 16L8 4h1.6l4 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M5.2 12.4h6.8" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M14 16V7.5c1.6-.4 3 .4 3 1.8v6.7M14 12h3" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </span>
+        <span class="nav-label">Font Generator</span>
+      </button>
+      <button data-id="siggen">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 15.5c2-.5 3-1.8 4-3.3 1.3-2 2-4.6 3-6.7.6-1.2 1.8-1.2 2.1.1.4 1.7-.2 4-.9 5.6-.5 1.1.3 1.4 1.2.7 1.3-1 2.3-2.3 3.6-2.6.9-.2 1.3.6.8 1.4-.5.9-1.5 1.6-1 2.5.4.7 1.5.4 2.2-.1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="nav-label">Signature Generator</span>
+      </button>
+      <button data-id="endec">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 5L2.5 10 7 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 5l4.5 5-4.5 5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.5 3.5l-3 13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav-label">Encode / Decode</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="theme-toggle" id="theme-toggle" title="Ganti tema terang/gelap">
+      <span class="theme-toggle-track"><span class="theme-toggle-knob" id="theme-toggle-knob">🌙</span></span>
+      <span class="theme-toggle-label" id="theme-toggle-label">Mode Gelap</span>
+    </button>
+  </div>
+</aside>
+
+<main>
+
+  <section class="panel active" id="panel-yt">
+    <div class="panel-header">
+      <h2>YouTube Downloader</h2>
+      <p class="desc">Tempel link video YouTube (video biasa atau Shorts), pilih kualitas, lalu download.</p>
+    </div>
+    <label>Link video</label>
+    <div class="input-clear-wrap">
+      <input type="url" id="yt-url" placeholder="https://www.youtube.com/watch?v=... atau https://www.youtube.com/shorts/..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="handleEnterKey(event, checkVideo)" />
+      <button type="button" class="input-paste-btn" onclick="pasteToInput('yt-url')" aria-label="Tempel dari clipboard">Paste</button>
+      <button type="button" class="input-clear-btn" onclick="clearInput('yt-url')" aria-label="Hapus teks">×</button>
+    </div>
+    <div class="input-history" id="yt-history"></div>
+    <button class="action" id="yt-check-btn" onclick="checkVideo()">Cek Video</button>
+    <div id="yt-status" class="hint"></div>
+    <div id="yt-result"></div>
+  </section>
+
+  <section class="panel" id="panel-tiktok">
+    <div class="panel-header">
+      <h2>TikTok Downloader</h2>
+      <p class="desc">Tempel link video/foto TikTok. Video otomatis tanpa watermark.</p>
+    </div>
+    <label>Link TikTok</label>
+    <div class="input-clear-wrap">
+      <input type="url" id="tiktok-url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="handleEnterKey(event, () => checkSocial('tiktok'))" />
+      <button type="button" class="input-paste-btn" onclick="pasteToInput('tiktok-url')" aria-label="Tempel dari clipboard">Paste</button>
+      <button type="button" class="input-clear-btn" onclick="clearInput('tiktok-url')" aria-label="Hapus teks">×</button>
+    </div>
+    <div class="input-history" id="tiktok-history"></div>
+    <button class="action" id="tiktok-check-btn" onclick="checkSocial('tiktok')">Cek Postingan</button>
+    <div id="tiktok-status" class="hint"></div>
+    <div id="tiktok-result"></div>
+  </section>
+
+  <section class="panel" id="panel-instagram">
+    <div class="panel-header">
+      <h2>Instagram Downloader</h2>
+      <p class="desc">Tempel link postingan Instagram <em>(Tidak mendukung highlight dan story)</em>.</p>
+    </div>
+    <label>Link Instagram</label>
+    <div class="input-clear-wrap">
+      <input type="url" id="instagram-url" placeholder="https://www.instagram.com/reel/..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="handleEnterKey(event, () => checkSocial('instagram'))" />
+      <button type="button" class="input-paste-btn" onclick="pasteToInput('instagram-url')" aria-label="Tempel dari clipboard">Paste</button>
+      <button type="button" class="input-clear-btn" onclick="clearInput('instagram-url')" aria-label="Hapus teks">×</button>
+    </div>
+    <div class="input-history" id="instagram-history"></div>
+    <button class="action" id="instagram-check-btn" onclick="checkSocial('instagram')">Cek Postingan</button>
+    <div id="instagram-status" class="hint"></div>
+    <div id="instagram-result"></div>
+  </section>
+
+  <section class="panel" id="panel-twitter">
+    <div class="panel-header">
+      <h2>Twitter / X Downloader</h2>
+      <p class="desc">Tempel link postingan Twitter/X yang berisi video atau foto.</p>
+    </div>
+    <label>Link Twitter / X</label>
+    <div class="input-clear-wrap">
+      <input type="url" id="twitter-url" placeholder="https://x.com/username/status/..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="handleEnterKey(event, () => checkSocial('twitter'))" />
+      <button type="button" class="input-paste-btn" onclick="pasteToInput('twitter-url')" aria-label="Tempel dari clipboard">Paste</button>
+      <button type="button" class="input-clear-btn" onclick="clearInput('twitter-url')" aria-label="Hapus teks">×</button>
+    </div>
+    <div class="input-history" id="twitter-history"></div>
+    <button class="action" id="twitter-check-btn" onclick="checkSocial('twitter')">Cek Postingan</button>
+    <div id="twitter-status" class="hint"></div>
+    <div id="twitter-result"></div>
+  </section>
+
+  <section class="panel" id="panel-capcut">
+    <div class="panel-header">
+      <h2>CapCut Template Downloader</h2>
+      <p class="desc">Tempel link template CapCut (dari tombol Share di app CapCut). Yang didownload adalah video preview/hasil-jadi dari template tersebut — bukan file project template-nya, karena format project CapCut cuma bisa dibuka di app CapCut.</p>
+    </div>
+    <label>Link Template CapCut</label>
+    <div class="input-clear-wrap">
+      <input type="url" id="capcut-url" placeholder="https://www.capcut.com/template/..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="handleEnterKey(event, checkCapcut)" />
+      <button type="button" class="input-paste-btn" onclick="pasteToInput('capcut-url')" aria-label="Tempel dari clipboard">Paste</button>
+      <button type="button" class="input-clear-btn" onclick="clearInput('capcut-url')" aria-label="Hapus teks">×</button>
+    </div>
+    <div class="input-history" id="capcut-history"></div>
+    <button class="action" id="capcut-check-btn" onclick="checkCapcut()">Cek Template</button>
+    <div id="capcut-status" class="hint"></div>
+    <div id="capcut-result"></div>
+  </section>
+
+  <section class="panel" id="panel-imgconv">
+    <div class="panel-header">
+      <h2>Image Converter</h2>
+      <p class="desc">Konversi gambar antar format (PNG, JPG, WEBP) langsung di browser. Bisa pilih banyak gambar sekaligus (Maksimal 10).</p>
+    </div>
+    
+    <div class="filebox" onclick="document.getElementById('img-file').click()">
+      <input type="file" id="img-file" accept="image/*" multiple onchange="handleImagePreview(event)" />
+      <span id="img-file-label">Klik untuk pilih gambar (PNG / JPG / WEBP)</span>
+    </div>
+
+    <div id="img-preview-grid" class="preview-grid" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;"></div>
+
+    <label>Convert ke</label>
+    <select id="img-format">
+      <option value="image/png">PNG</option>
+      <option value="image/jpeg">JPG</option>
+      <option value="image/webp">WEBP</option>
+      <option value="image/bmp">BMP</option>
+      <option value="image/gif">GIF</option>
+      <option value="image/x-icon">ICO</option>
+      <option value="image/avif">AVIF</option>
+    </select>
+    <br/>
+    <button class="action" id="img-convert-btn" onclick="convertImage()" disabled>Convert</button>
+    <div id="img-status" class="hint"></div>
+    <p class="hint" style="margin-top:6px;">Catatan: AVIF hanya jalan kalau browser kamu mendukung encoding-nya. BMP, GIF, dan ICO dikonversi manual jadi pasti jalan di semua browser. Jika mengonversi lebih dari 1 gambar, hasil akan didownload dalam format ZIP.</p>
+  </section>
+
+  <section class="panel" id="panel-imgcompress">
+    <div class="panel-header">
+      <h2>Compress Image</h2>
+      <p class="desc">Perkecil ukuran file gambar langsung di browser dengan atur level kualitas. Bisa pilih banyak gambar sekaligus (Maksimal 10).</p>
+    </div>
+
+    <div class="filebox" onclick="document.getElementById('imgc-file').click()">
+      <input type="file" id="imgc-file" accept="image/*" multiple onchange="handleImgCompressPreview(event)" />
+      <span id="imgc-file-label">Klik untuk pilih gambar (PNG / JPG / WEBP)</span>
+    </div>
+
+    <div id="imgc-preview-grid" class="preview-grid" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;"></div>
+
+    <label>Format Output</label>
+    <select id="imgc-format">
+      <option value="image/jpeg">JPG</option>
+      <option value="image/webp">WEBP</option>
+      <option value="image/png">PNG</option>
+    </select>
+
+    <label style="margin-top:10px; display:block;">Kualitas: <span id="imgc-quality-label">70%</span></label>
+    <input type="range" id="imgc-quality" min="10" max="100" value="70" step="5" style="width:100%;" oninput="document.getElementById('imgc-quality-label').textContent = this.value + '%'" />
+
+    <br/><br/>
+    <button class="action" id="imgc-compress-btn" onclick="compressImages()" disabled>Compress</button>
+    <div id="imgc-status" class="hint"></div>
+    <p class="hint" style="margin-top:6px;">Catatan: Kualitas cuma ngaruh signifikan buat format JPG/WEBP (lossy). Format PNG bersifat lossless jadi ukurannya gak akan banyak berubah walau kualitas diturunkan.</p>
+  </section>
+
+  <section class="panel" id="panel-mp4tomp3">
+    <div class="panel-header">
+      <h2>MP4 ke MP3</h2>
+      <p class="desc">Upload file video, Tools <strong>Dafa</strong> akan mengekstrak audionya jadi file MP3.</p>
+    </div>
+
+    <div class="filebox" id="mp4-filebox" onclick="document.getElementById('mp4-file').click()">
+      <input type="file" id="mp4-file" accept="video/*" onchange="handleMp4Preview(event)" />
+      <span id="mp4-file-label">Klik untuk pilih file video (MP4)</span>
+      <div id="mp4-thumb-wrap" style="display:none; margin-top:12px;">
+        <img id="mp4-thumb-img" alt="Thumbnail video" style="max-width:260px; width:100%; border-radius:10px; display:block; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,.25);" />
+      </div>
+    </div>
+
+    <button class="action" id="mp4-convert-btn" onclick="convertMp4ToMp3()" disabled>Convert &amp; Download MP3</button>
+    <div id="mp4-status" class="hint"></div>
+    <p class="hint" style="margin-top:6px;">Catatan: Ukuran file maksimal 300MB. Proses dilakukan di server, jadi waktu tunggu tergantung kecepatan upload dan durasi video kamu.</p>
+  </section>
+
+  <section class="panel" id="panel-bgremove">
+    <div class="panel-header">
+      <h2>Background Remover</h2>
+      <p class="desc">Hapus background gambar otomatis pakai AI, diproses langsung di browser kamu. Proses pertama kali agak lama karena model AI (±40MB) perlu didownload dulu, setelahnya jauh lebih cepat.</p>
+    </div>
+
+    <div class="filebox" onclick="document.getElementById('bgr-file').click()">
+      <input type="file" id="bgr-file" accept="image/*" onchange="handleBgRemovePreview(event)" />
+      <span id="bgr-file-label">Klik untuk pilih gambar (PNG / JPG / WEBP)</span>
+    </div>
+
+    <label>Mode</label>
+    <select id="bgr-model">
+      <option value="small">Cepat (kualitas cukup, disarankan)</option>
+      <option value="medium">Kualitas Tinggi (lebih lambat)</option>
+    </select>
+    <br/><br/>
+
+    <div id="bgr-compare-wrap" style="display:none; margin-top:15px; margin-bottom:15px;">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px;">
+          <img id="bgr-original-img" alt="Sebelum" style="width:100%; height:260px; object-fit:contain; background:rgba(0,0,0,.25); border-radius:10px;" />
+          <div style="font-size:13px; color:var(--text-muted); text-align:center; margin-top:6px;">Sebelum</div>
+        </div>
+        <div style="flex:1; min-width:200px;">
+          <div id="bgr-result-checker" style="width:100%; height:260px; border-radius:10px; overflow:hidden; outline:2px solid #28a745; background-image: linear-gradient(45deg, #666 25%, transparent 25%), linear-gradient(-45deg, #666 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #666 75%), linear-gradient(-45deg, transparent 75%, #666 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;">
+            <img id="bgr-result-img" alt="Sesudah" style="width:100%; height:100%; object-fit:contain; display:none;" />
+          </div>
+          <div style="font-size:13px; color:#28a745; text-align:center; margin-top:6px;">Sesudah (background transparan)</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="action" id="bgr-remove-btn" onclick="removeImageBg()" disabled>Hapus Background</button>
+    <a id="bgr-download-btn" class="action" style="display:none; text-align:center; background:#28a745; margin-top:10px; text-decoration:none;" download="background-removed.png">⬇ Download PNG</a>
+    <div id="bgr-status" class="hint"></div>
+    <p class="hint" style="margin-top:6px;">Hasil selalu berupa PNG dengan background transparan, cocok buat ditempel ke desain lain. Gambar yang sangat besar otomatis diperkecil dulu (maks. 1500px) sebelum diproses, biar gak kelamaan.</p>
+  </section>
+
+  <section class="panel" id="panel-img2pdf">
+    <div class="panel-header">
+      <h2>Gambar ke PDF</h2>
+      <p class="desc">Seret beberapa gambar atau klik untuk pilih file — digabung jadi satu PDF sesuai urutan.</p>
+    </div>
+
+    <div class="upload-area" id="i2p-upload-area">
+      <input type="file" id="i2p-files" accept="image/png,image/jpeg,image/jpg,image/webp" multiple />
+      <div class="upload-icon">🖼️</div>
+      <h3>Seret &amp; lepas gambar di sini</h3>
+      <p>PNG, JPG, WEBP — bisa pilih banyak sekaligus</p>
+    </div>
+
+    <div class="preview-section" id="i2p-preview-section">
+      <div class="preview-section-header">
+        <h4>Preview</h4>
+        <span id="i2p-count-label">0 gambar dipilih</span>
+      </div>
+      <div class="preview-grid" id="i2p-preview-grid"></div>
+    </div>
+
+    <div class="action-bar" id="i2p-action-bar">
+      <div class="action-info">Siap gabungkan <strong id="i2p-file-count">0</strong> gambar jadi 1 PDF</div>
+      <div class="action-buttons">
+        <button class="ghost" onclick="i2pClearAll()">Hapus Semua</button>
+        <button class="action" id="i2p-btn" onclick="imagesToPdf()">Konversi ke PDF</button>
+      </div>
+    </div>
+
+    <button class="action" id="i2p-download-btn" onclick="downloadI2pPdf()" style="display:none; margin-top:12px; background:#28a745;">⬇ Download PDF</button>
+
+    <div class="progress-wrap" id="i2p-progress-wrap">
+      <div class="progress-label" id="i2p-progress-label">Memproses...</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="i2p-progress-bar"></div></div>
+    </div>
+    <div id="i2p-status" class="hint"></div>
+  </section>
+
+  <section class="panel" id="panel-pdf2img">
+    <div class="panel-header">
+      <h2>PDF ke Gambar</h2>
+      <p class="desc">Ubah setiap halaman PDF jadi gambar PNG. Bisa didownload satu-satu atau sekaligus jadi ZIP.</p>
+    </div>
+    <div class="filebox" onclick="document.getElementById('p2i-file').click()">
+      <input type="file" id="p2i-file" accept="application/pdf" onchange="handleP2IPreview(event)" />
+      <span id="p2i-label">Klik untuk pilih file PDF</span>
+    </div>
+    <button class="action" id="p2i-btn" onclick="pdfToImages()" disabled>Convert</button>
+    <div id="p2i-status" class="hint"></div>
+
+    <div class="preview-section" id="p2i-preview-section" style="display:none; margin-top:16px;">
+      <div class="preview-section-header">
+        <h4>Hasil</h4>
+        <span id="p2i-count-label">0 halaman</span>
+      </div>
+      <div class="preview-grid" id="p2i-preview-grid"></div>
+      <button class="action" id="p2i-download-all-btn" onclick="downloadAllP2iImages()" style="margin-top:12px; background:#28a745;">⬇ Download Semua (ZIP)</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-pdfcompress">
+    <div class="panel-header">
+      <h2>Kompres PDF</h2>
+      <p class="desc">Kecilin ukuran file PDF langsung di browser. Prosesnya render tiap halaman lalu dikompres ulang — paling ampuh buat PDF hasil scan/foto dokumen. <strong>Catatan:</strong> kalau PDF kamu isinya teks asli (bukan hasil scan), hasil kompresnya bisa jadi malah lebih besar — jadi file aslinya udah paling optimal.</p>
+    </div>
+    <div class="filebox" onclick="document.getElementById('pdfc-file').click()">
+      <input type="file" id="pdfc-file" accept="application/pdf" onchange="handlePdfCompressPreview(event)" />
+      <span id="pdfc-label">Klik untuk pilih file PDF</span>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label>Level Kompresi</label>
+      <select id="pdfc-level">
+        <option value="ringan">Ringan (ukuran turun sedikit, kualitas terjaga)</option>
+        <option value="sedang" selected>Sedang (seimbang)</option>
+        <option value="kuat">Kuat (ukuran paling kecil, kualitas turun)</option>
+      </select>
+    </div>
+
+    <button class="action" id="pdfc-btn" onclick="compressPdf()" disabled style="margin-top:14px;">Kompres PDF</button>
+    <div id="pdfc-status" class="hint"></div>
+
+    <div id="pdfc-result-wrap" style="display:none; margin-top:16px;">
+      <div class="result-card">
+        <div class="result-info">
+          <div class="result-title">Hasil Kompresi</div>
+          <div class="result-sub" id="pdfc-size-before"></div>
+          <div class="result-sub" id="pdfc-size-after"></div>
+        </div>
+      </div>
+      <p id="pdfc-warning" class="hint hint-error" style="display:none; margin-top:8px;"></p>
+      <button class="action" id="pdfc-download-btn" onclick="downloadCompressedPdf()" style="margin-top:12px; background:#28a745;">⬇ Download PDF</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-qrgen">
+    <div class="panel-header">
+      <h2>QR Code Generator</h2>
+      <p class="desc">Buat QR Code dari teks, link, WiFi, atau kontak, bisa didesain bebas (bentuk titik, warna gradient, sampai logo di tengah) dan didownload PNG/SVG.</p>
+    </div>
+
+    <label>Isi QR Code</label>
+    <div class="input-clear-wrap">
+      <textarea id="qr-text" rows="3" placeholder="Tulis teks atau link di sini, mis. https://dafaalfiansyah.my.id" oninput="handleQrInput()" style="width:100%; resize:vertical; font-family:inherit;"></textarea>
+    </div>
+
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:14px;">
+      <div style="flex:1; min-width:140px;">
+        <label>Bentuk Titik</label>
+        <select id="qr-dots-type" onchange="renderQrPreview()">
+          <option value="square">Kotak</option>
+          <option value="dots">Bulat (Dots)</option>
+          <option value="rounded" selected>Rounded</option>
+          <option value="classy">Classy</option>
+          <option value="classy-rounded">Classy Rounded</option>
+          <option value="extra-rounded">Extra Rounded</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label>Bentuk Sudut (Frame)</label>
+        <select id="qr-corner-square-type" onchange="renderQrPreview()">
+          <option value="square">Kotak</option>
+          <option value="dot">Bulat</option>
+          <option value="extra-rounded" selected>Rounded</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label>Bentuk Titik Sudut</label>
+        <select id="qr-corner-dot-type" onchange="renderQrPreview()">
+          <option value="square">Kotak</option>
+          <option value="dot" selected>Bulat</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:14px;">
+      <div style="flex:1; min-width:140px;">
+        <label>Mode Warna QR</label>
+        <select id="qr-color-mode" onchange="toggleQrColorMode(); renderQrPreview()">
+          <option value="solid">Warna Polos</option>
+          <option value="gradient">Gradient</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label id="qr-fg-color-label">Warna QR</label>
+        <input type="color" id="qr-fg-color" value="#4f46e5" onchange="renderQrPreview()" style="width:100%; height:38px; padding:2px; cursor:pointer;" />
+      </div>
+      <div id="qr-fg-color2-wrap" style="flex:1; min-width:140px; display:none;">
+        <label>Warna QR (Gradient ke)</label>
+        <input type="color" id="qr-fg-color2" value="#9333ea" onchange="renderQrPreview()" style="width:100%; height:38px; padding:2px; cursor:pointer;" />
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label>Warna Latar</label>
+        <input type="color" id="qr-bg-color" value="#ffffff" onchange="renderQrPreview()" style="width:100%; height:38px; padding:2px; cursor:pointer;" />
+      </div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label>Logo di Tengah (opsional)</label>
+      <div class="filebox" onclick="document.getElementById('qr-logo-file').click()" style="padding:14px;">
+        <input type="file" id="qr-logo-file" accept="image/*" onchange="handleQrLogoChange(event)" />
+        <span id="qr-logo-label">Klik untuk pilih logo (PNG/JPG, background transparan disarankan)</span>
+      </div>
+      <button class="ghost" id="qr-logo-clear-btn" onclick="clearQrLogo()" style="display:none; margin-top:8px; font-size:12px; padding:5px 10px;">Hapus Logo</button>
+    </div>
+
+    <div id="qr-preview-wrap" style="display:none; margin-top:20px; text-align:center;">
+      <div id="qr-canvas-container" style="display:inline-block; padding:16px; border-radius:12px; max-width:320px;"></div>
+      <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
+        <button class="action" onclick="downloadQrCode('png')">⬇ Download PNG</button>
+        <button class="ghost" onclick="downloadQrCode('svg')">⬇ Download SVG</button>
+      </div>
+    </div>
+    <div id="qr-status" class="hint"></div>
+  </section>
+
+  <section class="panel" id="panel-fontgen">
+    <div class="panel-header">
+      <h2>Font Generator</h2>
+      <p class="desc">Tulis teks di bawah, langsung berubah jadi berbagai gaya font aesthetic. Tinggal klik "Salin" buat dipakai di bio, caption, atau nickname.</p>
+    </div>
+
+    <label>Tulis Teks</label>
+    <div class="input-clear-wrap">
+      <input type="text" id="fontgen-input" placeholder="Contoh: Tools Dapxz" autocomplete="off" oninput="renderFontGenResults()" />
+    </div>
+
+    <div id="fontgen-results" class="fontgen-results" style="margin-top:16px;"></div>
+  </section>
+
+  <section class="panel" id="panel-siggen">
+    <div class="panel-header">
+      <h2>Signature Generator</h2>
+      <p class="desc">Ubah nama kamu jadi tanda tangan digital. Pilih gaya tulisan, atur warna & ukuran, lalu download PNG (background transparan) buat dipakai di dokumen atau kontrak online.</p>
+    </div>
+
+    <label>Nama / Teks Tanda Tangan</label>
+    <div class="input-clear-wrap">
+      <input type="text" id="sig-input" placeholder="Contoh: Dafa Alfiansyah" autocomplete="off" oninput="renderSignatureStyles()" />
+    </div>
+
+    <div id="sig-style-grid" class="signature-style-grid" style="margin-top:16px;"></div>
+
+    <div id="sig-editor" style="display:none; margin-top:20px;">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:140px;">
+          <label>Warna Tanda Tangan</label>
+          <input type="color" id="sig-color" value="#1a1a1a" oninput="renderSignaturePreview()" style="width:100%; height:38px; padding:2px; cursor:pointer;" />
+        </div>
+        <div style="flex:2; min-width:200px;">
+          <label>Ukuran</label>
+          <input type="range" id="sig-size" min="40" max="140" value="90" oninput="renderSignaturePreview()" style="width:100%;" />
+        </div>
+      </div>
+
+      <div style="margin-top:20px; text-align:center;">
+        <div id="sig-canvas-wrap" class="signature-canvas-wrap">
+          <canvas id="sig-canvas" width="700" height="260"></canvas>
+        </div>
+        <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
+          <button class="action" onclick="downloadSignature('transparent')">⬇ Download PNG (Transparan)</button>
+          <button class="ghost" onclick="downloadSignature('white')">⬇ Download PNG (Putih)</button>
+        </div>
+      </div>
+    </div>
+    <div id="sig-status" class="hint"></div>
+  </section>
+
+  <section class="panel" id="panel-endec">
+    <div class="panel-header">
+      <h2>Encode / Decode Teks</h2>
+      <p class="desc">Encode atau decode teks ke berbagai format: Base64, URL, Hex, Binary, HTML Entities, dan ROT13.</p>
+    </div>
+
+    <label>Format</label>
+    <select id="endec-method" onchange="handleEndecInput()">
+      <option value="base64">Base64</option>
+      <option value="url">URL Encode</option>
+      <option value="hex">Hex</option>
+      <option value="binary">Binary</option>
+      <option value="html">HTML Entities</option>
+      <option value="rot13">ROT13</option>
+    </select>
+
+    <label style="margin-top:14px;">Teks Input</label>
+    <div class="input-clear-wrap">
+      <textarea id="endec-input" rows="5" placeholder="Tulis atau paste teks di sini..." oninput="handleEndecInput()" style="width:100%; resize:vertical; font-family:var(--font-mono);"></textarea>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+      <button class="action" onclick="runEncodeDecode('encode')">Encode →</button>
+      <button class="action" id="endec-decode-btn" onclick="runEncodeDecode('decode')" style="background:#28a745;">← Decode</button>
+      <button class="ghost" onclick="swapEndec()">⇅ Tukar Input/Output</button>
+    </div>
+
+    <label style="margin-top:18px;">Hasil</label>
+    <div class="input-clear-wrap">
+      <textarea id="endec-output" rows="5" readonly placeholder="Hasil akan muncul di sini..." style="width:100%; resize:vertical; font-family:var(--font-mono);"></textarea>
+    </div>
+    <button class="ghost" id="endec-copy-btn" onclick="copyEndecOutput(this)" style="margin-top:8px; font-size:12px; padding:6px 12px;">Salin Hasil</button>
+
+    <div id="endec-status" class="hint"></div>
+  </section>
+
+</main>
+
+<script src="script.js" defer></script>
+</body>
+</html>
