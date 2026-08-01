@@ -70,8 +70,8 @@ Sebelum menjalankan secara lokal, pastikan sudah terpasang:
 
 1. **Clone repository**
    ```bash
-   git clone https://github.com/dapxzhosting/<nama-repo>.git
-   cd <nama-repo>
+   git clone https://github.com/dapxzhosting/tools-dapxz.git
+   cd tools-dapxz
    ```
 
 2. **Install dependency**
