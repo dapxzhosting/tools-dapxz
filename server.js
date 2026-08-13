@@ -62,7 +62,7 @@ const mp4Upload = multer({
 });
 
 function runYtDlp(args) {
-  const clientArgs = ['--extractor-args', 'youtube:player_client=web'];
+  const clientArgs = ['--extractor-args', 'youtube:player_client=android'];
   const remoteComponentsArgs = ['--remote-components', 'ejs:github'];
   const finalArgs = [
     ...(COOKIES_PATH ? ['--cookies', COOKIES_PATH] : []),
@@ -176,7 +176,7 @@ app.get('/api/download', async (req, res) => {
 
     const args = [
       ...(COOKIES_PATH ? ['--cookies', COOKIES_PATH] : []),
-      '--extractor-args', 'youtube:player_client=web',
+      '--extractor-args', 'youtube:player_client=android',
       '--remote-components', 'ejs:github',
       '-f', formatSelector,
       '--merge-output-format', 'mp4',
@@ -1503,10 +1503,6 @@ app.post('/api/capcut/info', async (req, res) => {
       thumbnail: data.thumbnail ? `/api/social/proxy-thumbnail?url=${encodeURIComponent(data.thumbnail)}` : null,
       author: data.author,
       description: data.description,
-      _debug_usedJsonEmbedded: data.usedJsonEmbedded,
-      _debug_usedDomVideo: data.usedDomVideo,
-      _debug_usedNetworkSource: data.usedNetworkSource,
-      _debug_usedPlayAddr: data.usedPlayAddr,
     });
   } catch (err) {
     console.error('[capcut/info] error:', err.message);
