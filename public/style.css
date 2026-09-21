@@ -211,11 +211,17 @@ input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(
 }
 .history-chip:hover{ border-color:var(--accent); color:var(--text); }
 
-button.action{
+.icon{ width:14px; height:14px; flex-shrink:0; vertical-align:-2px; }
+.icon-lg{ width:28px; height:28px; }
+.mobile-menu-btn .icon, .mobile-theme-btn .icon, .theme-toggle-knob .icon{ width:16px; height:16px; }
+.theme-toggle-knob{ display:inline-flex; align-items:center; justify-content:center; }
+.result-sub{ display:inline-flex; align-items:center; gap:5px; }
+button.action, a.action{
   all:unset; box-sizing:border-box; cursor:pointer; background:var(--accent); color:var(--accent-text);
   padding:10px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:700; margin-top:12px;
   font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.03em;
   transition: opacity .15s ease;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
 }
 button.action:hover{ opacity:.85; }
 button.action:active{ opacity:.7; }
@@ -226,6 +232,7 @@ button.ghost{
   padding:9px 14px; border-radius:var(--radius-sm); font-size:13px; border:1px solid var(--border);
   margin-top:4px; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.03em;
   transition: color .15s ease, border-color .15s ease;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
 }
 button.ghost:hover{ color:var(--text); border-color:var(--accent); }
 
@@ -316,7 +323,7 @@ select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var
 .upload-area:hover{ border-color:var(--accent); background:var(--accent-soft); }
 .upload-area.drag-over{ border-color:var(--accent); background:var(--accent-soft); transform:scale(1.01); }
 .upload-area input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
-.upload-area .upload-icon{ font-size:30px; margin-bottom:10px; }
+.upload-area .upload-icon{ margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
 .upload-area h3{ font-size:14px; font-weight:600; margin:0 0 4px; color:var(--text); }
 .upload-area p{ font-size:12.5px; color:var(--text-muted); margin:0; }
 
@@ -388,6 +395,7 @@ select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var
   border-top:1px solid var(--border); font-family:var(--font-ui);
   transition: background .15s ease, color .15s ease;
   flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; gap:5px;
 }
 .social-image-grid .dl-btn-individual:hover{ background:var(--accent); color:var(--accent-text); }
 .social-image-grid .dl-btn-individual:active{ opacity:.8; }
