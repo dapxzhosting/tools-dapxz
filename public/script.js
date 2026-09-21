@@ -1,3 +1,13 @@
+const ICONS = {
+  download: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
+  music: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+  user: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  clock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+  warning: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>',
+  sun: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
+  moon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+};
+
 document.querySelectorAll('#nav-downloader button, #nav-converter button, #nav-generator button').forEach((btn) => {
   btn.addEventListener('click', () => {
     const id = btn.dataset.id;
@@ -31,9 +41,9 @@ function applyTheme(theme) {
   const knob = document.getElementById('theme-toggle-knob');
   const label = document.getElementById('theme-toggle-label');
   const mobileIcon = document.getElementById('mobile-theme-icon');
-  if (knob) knob.textContent = isDark ? '🌙' : '☀️';
+  if (knob) knob.innerHTML = isDark ? ICONS.moon : ICONS.sun;
   if (label) label.textContent = isDark ? 'Mode Gelap' : 'Mode Terang';
-  if (mobileIcon) mobileIcon.textContent = isDark ? '🌙' : '☀️';
+  if (mobileIcon) mobileIcon.innerHTML = isDark ? ICONS.moon : ICONS.sun;
 }
 document.getElementById('theme-toggle')?.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme');
@@ -142,9 +152,9 @@ function renderSocialResult(platform, url, data, container) {
       </div>
     </div>
     <div class="result-actions" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-video">⬇ Download Video</button>` : ''}
-      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-mp3" style="background:#28a745;">🎵 Download MP3</button>` : ''}
-      ${isPhotoOnly ? `<button class="action" id="${platform}-dl-images">⬇ Download Semua Foto${data.image_count > 1 ? ` (${data.image_count})` : ''}</button>` : ''}
+      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-video">${ICONS.download} Download Video</button>` : ''}
+      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-mp3" style="background:#28a745;">${ICONS.music} Download MP3</button>` : ''}
+      ${isPhotoOnly ? `<button class="action" id="${platform}-dl-images">${ICONS.download} Download Semua Foto${data.image_count > 1 ? ` (${data.image_count})` : ''}</button>` : ''}
     </div>
     ${isPhotoOnly ? `<div id="${platform}-image-preview" style="margin-top:14px;"><div class="hint" style="color:var(--text-muted);">Memuat preview foto...</div></div>` : ''}
   `;
@@ -182,7 +192,7 @@ async function fetchAndRenderImagePreviews(platform, url) {
       <div class="img-item">
         <img src="data:${img.mime};base64,${img.data}" alt="Foto ${idx + 1}" loading="lazy" />
         <button class="dl-btn-individual" onclick="downloadSingleImage('${platform}', ${idx})" title="Download foto ${idx + 1}">
-          ⬇ Foto ${idx + 1}
+          ${ICONS.download} Foto ${idx + 1}
         </button>
       </div>
     `).join('');
@@ -192,7 +202,7 @@ async function fetchAndRenderImagePreviews(platform, url) {
     `;
 
     const dlAllBtn = document.getElementById(`${platform}-dl-images`);
-    if (dlAllBtn) dlAllBtn.textContent = `⬇ Download Semua Foto (${data.images.length})`;
+    if (dlAllBtn) dlAllBtn.innerHTML = `${ICONS.download} Download Semua Foto (${data.images.length})`;
 
     setStatus(`${platform}-status`, `${data.images.length} foto siap didownload.`, 'success');
   } catch (err) {
@@ -296,11 +306,11 @@ async function checkCapcut() {
         ${data.thumbnail ? `<img src="${data.thumbnail}" alt="Thumbnail" class="result-thumb" />` : ''}
         <div class="result-info">
           <div class="result-title">${escapeHtml(data.title || 'CapCut Template')}</div>
-          ${data.author ? `<div class="result-sub">👤 ${escapeHtml(data.author)}</div>` : ''}
+          ${data.author ? `<div class="result-sub">${ICONS.user} ${escapeHtml(data.author)}</div>` : ''}
           ${data.description ? `<div class="result-sub">${escapeHtml(data.description)}</div>` : ''}
         </div>
       </div>
-      <button class="action" id="capcut-dl-video" style="margin-top:12px;">⬇ Download Video</button>
+      <button class="action" id="capcut-dl-video" style="margin-top:12px;">${ICONS.download} Download Video</button>
     `;
     document.getElementById('capcut-dl-video')?.addEventListener('click', () => downloadCapcutVideo(url));
   } catch (err) {
@@ -385,8 +395,8 @@ function renderYoutubeResult(url, data, container) {
       ${data.thumbnail ? `<img src="${data.thumbnail}" alt="Thumbnail" class="result-thumb" />` : ''}
       <div class="result-info">
         <div class="result-title">${escapeHtml(data.title || 'Video YouTube')}</div>
-        ${data.author ? `<div class="result-sub">👤 ${escapeHtml(data.author)}</div>` : ''}
-        ${data.duration ? `<div class="result-sub">⏱️ ${formatDuration(data.duration)}</div>` : ''}
+        ${data.author ? `<div class="result-sub">${ICONS.user} ${escapeHtml(data.author)}</div>` : ''}
+        ${data.duration ? `<div class="result-sub">${ICONS.clock} ${formatDuration(data.duration)}</div>` : ''}
       </div>
     </div>
     <div style="margin-top:12px;">
@@ -394,7 +404,7 @@ function renderYoutubeResult(url, data, container) {
       <select id="yt-format">${formatOptions}</select>
     </div>
     <div class="result-actions" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-      <button class="action" id="yt-dl-video">⬇ Download</button>
+      <button class="action" id="yt-dl-video">${ICONS.download} Download</button>
     </div>
   `;
 
@@ -969,7 +979,7 @@ async function compressPdf() {
     if (warnEl) {
       warnEl.style.display = isBigger ? 'block' : 'none';
       warnEl.textContent = isBigger
-        ? '⚠️ Hasil kompresi malah lebih besar dari aslinya. Ini biasa terjadi kalau PDF kamu isinya teks asli (bukan hasil scan/foto) — teks vector emang udah ringan dari sononya, jadi gak perlu dikompres. Disarankan pakai file PDF yang asli aja.'
+        ? 'Hasil kompresi malah lebih besar dari aslinya. Ini biasa terjadi kalau PDF kamu isinya teks asli (bukan hasil scan/foto) — teks vector emang udah ringan dari sononya, jadi gak perlu dikompres. Disarankan pakai file PDF yang asli aja.'
         : '';
     }
     if (downloadBtn) downloadBtn.style.background = isBigger ? '#e5484d' : '#28a745';
@@ -1053,7 +1063,7 @@ async function pdfToImages() {
         label.style.cssText = 'font-size:11px; color:var(--text-muted, #9aa0a6);';
         const dlBtn = document.createElement('button');
         dlBtn.className = 'ghost';
-        dlBtn.textContent = '⬇ Download';
+        dlBtn.innerHTML = `${ICONS.download} Download`;
         dlBtn.style.cssText = 'font-size:12px; padding:5px 10px;';
         dlBtn.addEventListener('click', () => triggerBlobDownload(blob, filename));
         wrap.appendChild(img);
