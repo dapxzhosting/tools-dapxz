@@ -312,6 +312,11 @@ async function cobaltFetch(url) {
   return json;
 }
 
+// Item picker cobalt: type 'video' / 'gif' = video, selain itu dianggap foto
+function isIgVideoItem(it) {
+  return it && (it.type === 'video' || it.type === 'gif');
+}
+
 async function ytdlpTwitterInfo(url) {
   const output = await runYtDlp(['-j', '--no-warnings', url]);
   return JSON.parse(output);
@@ -675,11 +680,19 @@ app.post('/api/social/info', async (req, res) => {
 
       let contentType = 'video';
       let thumbnail = null;
+      let videoCount = 0;
+      let photoCount = 0;
 
       if (isPicker) {
-        const photoItems = items.filter((it) => it.type !== 'video');
-        contentType = photoItems.length > 1 ? 'carousel' : (photoItems.length === 1 && items.length === 1 ? 'image' : 'carousel');
-        thumbnail = items[0]?.thumb ? `/api/social/proxy-thumbnail?url=${encodeURIComponent(items[0].thumb)}` : null;
+        videoCount = items.filter(isIgVideoItem).length;
+        photoCount = items.length - videoCount;
+        if (videoCount > 0 && photoCount > 0) contentType = 'mixed';          // video + foto/thumbnail
+        else if (videoCount > 0) contentType = items.length === 1 ? 'video' : 'mixed'; // 1 video / banyak video
+        else contentType = items.length === 1 ? 'image' : 'carousel';          // foto saja
+        // thumbnail preview: utamakan item video biar kelihatan ini video
+        const firstVideo = items.find(isIgVideoItem);
+        const thumbSrc = (firstVideo && firstVideo.thumb) || items[0]?.thumb || null;
+        thumbnail = thumbSrc ? `/api/social/proxy-thumbnail?url=${encodeURIComponent(thumbSrc)}` : null;
       } else if (data.url) {
         try {
           const headResp = await fetchWithTimeout(data.url, { method: 'HEAD' }, 8000);
@@ -700,7 +713,8 @@ app.post('/api/social/info', async (req, res) => {
         view_count: null,
         like_count: null,
         content_type: contentType,
-        image_count: isPicker ? items.length : (contentType === 'image' ? 1 : 0),
+        image_count: isPicker ? photoCount : (contentType === 'image' ? 1 : 0),
+        video_count: isPicker ? videoCount : (contentType === 'video' ? 1 : 0),
       });
     } catch (err) {
       console.error('[social/info/instagram] cobalt gagal:', err.message);
@@ -887,10 +901,14 @@ app.post('/api/social/download', async (req, res) => {
 
     try {
       const data = await cobaltFetch(url);
+      let videoUrl = data.url;
       if (data.status === 'picker') {
-        return res.status(400).json({ error: 'Ini postingan carousel. Gunakan tombol Download Foto/Video.' });
+        const vid = (data.picker || []).find(isIgVideoItem);
+        if (!vid) {
+          return res.status(400).json({ error: 'Postingan ini hanya berisi foto. Gunakan tombol Download Foto.' });
+        }
+        videoUrl = vid.url;
       }
-      const videoUrl = data.url;
       if (!videoUrl) throw new Error('No URL from cobalt');
       const r = await fetchWithTimeout(videoUrl, {}, 60000);
       if (!r.ok) throw new Error(`cobalt stream ${r.status}`);
@@ -1006,8 +1024,12 @@ app.post('/api/social/download-mp3', async (req, res) => {
   if (platform === 'instagram') {
     try {
       const data = await cobaltFetch(url);
-      if (data.status === 'picker') return res.status(400).json({ error: 'Carousel tidak bisa dikonversi ke MP3 langsung.' });
-      const videoUrl = data.url;
+      let videoUrl = data.url;
+      if (data.status === 'picker') {
+        const vid = (data.picker || []).find(isIgVideoItem);
+        if (!vid) return res.status(400).json({ error: 'Postingan ini tidak berisi video untuk dikonversi ke MP3.' });
+        videoUrl = vid.url;
+      }
       if (!videoUrl) throw new Error('No URL from cobalt');
       const mp3Path = await convertToMp3(videoUrl);
       return res.download(mp3Path, generateFileName('instagram', 'mp3'), () => fs.unlink(mp3Path, () => {}));
@@ -1134,7 +1156,7 @@ app.post('/api/social/download-images', async (req, res) => {
       const items = data.picker || [];
       const settled = await Promise.allSettled(
         items.map(async (item, i) => {
-          const r = await fetchWithTimeout(item.url, {}, 30000);
+          const r = await fetchWithTimeout(item.url, {}, 60000);
           if (!r.ok) throw new Error(`Gagal download item ${i + 1}`);
           const buf = await r.buffer();
           const ct = r.headers.get('content-type') || 'image/jpeg';

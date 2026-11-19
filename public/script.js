@@ -140,7 +140,10 @@ async function checkSocial(platform) {
 
 function renderSocialResult(platform, url, data, container) {
   if (!container) return;
+  const isMixed = data.content_type === 'mixed';            // video + foto/thumbnail
   const isPhotoOnly = data.content_type === 'image' || data.content_type === 'carousel';
+  const hasVideo = !isPhotoOnly;                            // video atau mixed
+  const hasMedia = isPhotoOnly || isMixed;                  // perlu grid preview + download semua
 
   container.innerHTML = `
     <div class="result-card">
@@ -148,22 +151,22 @@ function renderSocialResult(platform, url, data, container) {
       <div class="result-info">
         <div class="result-title">${escapeHtml(data.title || 'Postingan')}</div>
         ${data.uploader ? `<div class="result-sub">${escapeHtml(data.uploader)}</div>` : ''}
-        ${data.content_type ? `<div class="result-sub">Tipe: ${data.content_type}${data.image_count ? ` (${data.image_count} foto)` : ''}</div>` : ''}
+        ${data.content_type ? `<div class="result-sub">Tipe: ${data.content_type}${data.video_count ? ` (${data.video_count} video${data.image_count ? `, ${data.image_count} foto` : ''})` : (data.image_count ? ` (${data.image_count} foto)` : '')}</div>` : ''}
       </div>
     </div>
     <div class="result-actions" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-video">${ICONS.download} Download Video</button>` : ''}
-      ${!isPhotoOnly ? `<button class="action" id="${platform}-dl-mp3" style="background:#28a745;">${ICONS.music} Download MP3</button>` : ''}
-      ${isPhotoOnly ? `<button class="action" id="${platform}-dl-images">${ICONS.download} Download Semua Foto${data.image_count > 1 ? ` (${data.image_count})` : ''}</button>` : ''}
+      ${hasVideo ? `<button class="action" id="${platform}-dl-video">${ICONS.download} Download Video</button>` : ''}
+      ${hasVideo ? `<button class="action" id="${platform}-dl-mp3" style="background:#28a745;">${ICONS.music} Download MP3</button>` : ''}
+      ${hasMedia ? `<button class="action" id="${platform}-dl-images">${ICONS.download} ${isMixed ? 'Download Video + Foto' : 'Download Semua Foto'}${(data.image_count + (data.video_count || 0)) > 1 ? ` (${data.image_count + (data.video_count || 0)})` : ''}</button>` : ''}
     </div>
-    ${isPhotoOnly ? `<div id="${platform}-image-preview" style="margin-top:14px;"><div class="hint" style="color:var(--text-muted);">Memuat preview foto...</div></div>` : ''}
+    ${hasMedia ? `<div id="${platform}-image-preview" style="margin-top:14px;"><div class="hint" style="color:var(--text-muted);">Memuat preview...</div></div>` : ''}
   `;
 
   document.getElementById(`${platform}-dl-video`)?.addEventListener('click', () => downloadSocialMedia(platform, url, 'video'));
   document.getElementById(`${platform}-dl-mp3`)?.addEventListener('click', () => downloadSocialMedia(platform, url, 'mp3'));
   document.getElementById(`${platform}-dl-images`)?.addEventListener('click', () => downloadSocialMediaAll(platform, url));
 
-  if (isPhotoOnly) {
+  if (hasMedia) {
     fetchAndRenderImagePreviews(platform, url);
   }
 }
@@ -190,9 +193,11 @@ async function fetchAndRenderImagePreviews(platform, url) {
 
     const gridHTML = data.images.map((img, idx) => `
       <div class="img-item">
-        <img src="data:${img.mime};base64,${img.data}" alt="Foto ${idx + 1}" loading="lazy" />
-        <button class="dl-btn-individual" onclick="downloadSingleImage('${platform}', ${idx})" title="Download foto ${idx + 1}">
-          ${ICONS.download} Foto ${idx + 1}
+        ${img.mime.startsWith('video/')
+          ? `<video src="data:${img.mime};base64,${img.data}" controls playsinline preload="metadata" style="max-width:100%;"></video>`
+          : `<img src="data:${img.mime};base64,${img.data}" alt="Foto ${idx + 1}" loading="lazy" />`}
+        <button class="dl-btn-individual" onclick="downloadSingleImage('${platform}', ${idx})" title="Download ${img.mime.startsWith('video/') ? 'video' : 'foto'} ${idx + 1}">
+          ${ICONS.download} ${img.mime.startsWith('video/') ? 'Video' : 'Foto'} ${idx + 1}
         </button>
       </div>
     `).join('');
@@ -202,9 +207,9 @@ async function fetchAndRenderImagePreviews(platform, url) {
     `;
 
     const dlAllBtn = document.getElementById(`${platform}-dl-images`);
-    if (dlAllBtn) dlAllBtn.innerHTML = `${ICONS.download} Download Semua Foto (${data.images.length})`;
+    if (dlAllBtn) dlAllBtn.innerHTML = `${ICONS.download} ${data.images.some((i) => i.mime.startsWith('video/')) ? 'Download Video + Foto' : 'Download Semua Foto'} (${data.images.length})`;
 
-    setStatus(`${platform}-status`, `${data.images.length} foto siap didownload.`, 'success');
+    setStatus(`${platform}-status`, `${data.images.length} media siap didownload.`, 'success');
   } catch (err) {
     previewContainer.innerHTML = `<div class="hint hint-error">${escapeHtml(err.message)}</div>`;
     setStatus(`${platform}-status`, err.message, 'error');
