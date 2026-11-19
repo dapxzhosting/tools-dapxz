@@ -317,6 +317,107 @@ function isIgVideoItem(it) {
   return it && (it.type === 'video' || it.type === 'gif');
 }
 
+// ===== Instagram Reel: yt-dlp sebagai jalur utama, cobalt hanya cadangan =====
+// Kenapa: untuk reel, cobalt kadang cuma mengembalikan gambar/thumbnail. yt-dlp mengambil file video aslinya.
+function isIgReelUrl(url) {
+  return /instagram\.com\/(?:[\w.]+\/)?(reel|reels|tv)\/[\w-]+/.test(String(url).split('?')[0]);
+}
+
+// Ubah cookie IG (kalau ada, dipakai juga untuk Story) jadi file Netscape untuk yt-dlp
+function igWriteYtDlpCookieFile() {
+  try {
+    if (!igHasCookies()) return null;
+    const cookies = igLoadCookiesRaw();
+    const exp = Math.floor(Date.now() / 1000) + 86400 * 365;
+    const lines = ['# Netscape HTTP Cookie File'];
+    for (const c of cookies) {
+      if (!c || !c.name || c.value === undefined) continue;
+      const domain = c.domain || '.instagram.com';
+      lines.push([domain.startsWith('.') ? domain : '.' + domain, 'TRUE', c.path || '/', 'TRUE', exp, c.name, c.value].join('\t'));
+    }
+    const p = path.join(os.tmpdir(), 'ig-ytdlp-cookies.txt');
+    fs.writeFileSync(p, lines.join('\n') + '\n', 'utf8');
+    return p;
+  } catch {
+    return null;
+  }
+}
+
+async function igReelViaYtDlp(url) {
+  const clean = url.split('?')[0]; // buang parameter tracking seperti ?gwpx=...
+  const attempt = async (extra) => {
+    const raw = await runYtDlp(['-J', '--no-warnings', '-f', 'b[ext=mp4]/b', ...extra, clean]);
+    return JSON.parse(raw);
+  };
+  let info;
+  try {
+    info = await attempt([]);
+  } catch (e1) {
+    const ck = igWriteYtDlpCookieFile();
+    if (!ck) throw e1;
+    console.warn('[ig/reel] yt-dlp tanpa cookie gagal, coba pakai cookie IG:', String(e1.message).slice(0, 200));
+    info = await attempt(['--cookies', ck]);
+  }
+  const v = info._type === 'playlist'
+    ? (info.entries || []).find((e) => e && e.url && e.vcodec !== 'none')
+    : info;
+  if (!v || !v.url) throw new Error('yt-dlp tidak menemukan URL video');
+  return {
+    videoUrl: v.url,
+    headers: v.http_headers || {},
+    thumb: info.thumbnail || v.thumbnail || null,
+    title: info.title || null,
+    uploader: info.uploader || info.channel || null,
+    duration: info.duration || null,
+    view_count: info.view_count || null,
+    like_count: info.like_count || null,
+    source: 'yt-dlp',
+  };
+}
+
+async function igReelViaCobalt(url) {
+  const data = await cobaltFetch(url.split('?')[0]);
+  let videoUrl = data.url;
+  let thumb = null;
+  if (data.status === 'picker') {
+    const vid = (data.picker || []).find(isIgVideoItem);
+    if (!vid) throw new Error('cobalt hanya mengembalikan foto untuk reel ini');
+    videoUrl = vid.url;
+    thumb = vid.thumb || null;
+  } else {
+    if (!videoUrl) throw new Error('No URL from cobalt');
+    let ct = '';
+    try {
+      const h = await fetchWithTimeout(videoUrl, { method: 'HEAD' }, 8000);
+      ct = h.headers.get('content-type') || '';
+    } catch { /* abaikan, lanjut */ }
+    if (ct.startsWith('image/')) throw new Error('cobalt mengembalikan gambar (bukan video) untuk reel ini');
+  }
+  return { videoUrl, headers: {}, thumb, title: null, uploader: null, duration: null, view_count: null, like_count: null, source: 'cobalt' };
+}
+
+const igReelCache = new Map();
+async function igGetReelVideo(url) {
+  const key = url.split('?')[0];
+  const hit = igReelCache.get(key);
+  if (hit && Date.now() - hit.t < 5 * 60 * 1000) return hit.v;
+  let v;
+  try {
+    v = await igReelViaYtDlp(url);
+  } catch (e1) {
+    console.warn('[ig/reel] yt-dlp gagal:', String(e1.message).slice(0, 300));
+    try {
+      v = await igReelViaCobalt(url);
+    } catch (e2) {
+      throw new Error(`yt-dlp: ${String(e1.message).slice(0, 200)} | cobalt: ${String(e2.message).slice(0, 200)}`);
+    }
+  }
+  console.log(`[ig/reel] berhasil via ${v.source}`);
+  if (igReelCache.size > 50) igReelCache.delete(igReelCache.keys().next().value);
+  igReelCache.set(key, { t: Date.now(), v });
+  return v;
+}
+
 async function ytdlpTwitterInfo(url) {
   const output = await runYtDlp(['-j', '--no-warnings', url]);
   return JSON.parse(output);
@@ -555,7 +656,7 @@ app.get('/api/social/proxy-thumbnail', async (req, res) => {
   if (!url) return res.status(400).send('Missing url');
   try {
     const r = await fetchWithTimeout(url, {
-      headers: { Referer: 'https://www.tiktok.com/', 'User-Agent': 'Mozilla/5.0' },
+      headers: { Referer: /instagram|fbcdn/.test(url) ? 'https://www.instagram.com/' : 'https://www.tiktok.com/', 'User-Agent': 'Mozilla/5.0' },
     }, 10000);
     if (!r.ok) return res.status(r.status).send('Fetch failed');
     res.setHeader('Content-Type', r.headers.get('content-type') || 'image/jpeg');
@@ -670,6 +771,27 @@ app.post('/api/social/info', async (req, res) => {
       } catch (err) {
         console.error('[social/info/instagram] story via session gagal:', err.message);
         return res.status(500).json({ error: err.message || 'Gagal mengambil Story. Kemungkinan session akun scraper expired/kena checkpoint.' });
+      }
+    }
+
+    if (isIgReelUrl(url)) {
+      try {
+        const v = await igGetReelVideo(url);
+        return res.json({
+          platform: 'instagram',
+          title: v.title || 'Instagram Reel',
+          thumbnail: v.thumb ? `/api/social/proxy-thumbnail?url=${encodeURIComponent(v.thumb)}` : null,
+          duration: v.duration,
+          uploader: v.uploader,
+          view_count: v.view_count,
+          like_count: v.like_count,
+          content_type: 'video',
+          image_count: 0,
+          video_count: 1,
+        });
+      } catch (err) {
+        console.error('[social/info/instagram] reel gagal:', err.message);
+        return res.status(500).json({ error: 'Gagal mengambil video Reel. Pastikan reel publik lalu coba lagi. (Detail ada di log server.)' });
       }
     }
 
@@ -899,6 +1021,21 @@ app.post('/api/social/download', async (req, res) => {
       return;
     }
 
+    if (isIgReelUrl(url)) {
+      try {
+        const v = await igGetReelVideo(url);
+        const r = await fetchWithTimeout(v.videoUrl, { headers: v.headers || {} }, 60000);
+        if (!r.ok) throw new Error(`reel video fetch ${r.status}`);
+        res.setHeader('Content-Disposition', `attachment; filename="${generateFileName('instagram', 'mp4')}"`);
+        res.setHeader('Content-Type', 'video/mp4');
+        r.body.pipe(res);
+      } catch (err) {
+        console.error('[social/download/instagram] reel gagal:', err.message);
+        if (!res.headersSent) return res.status(500).json({ error: 'Gagal mendownload video Reel. Pastikan reel publik lalu coba lagi.' });
+      }
+      return;
+    }
+
     try {
       const data = await cobaltFetch(url);
       let videoUrl = data.url;
@@ -1022,6 +1159,17 @@ app.post('/api/social/download-mp3', async (req, res) => {
   }
 
   if (platform === 'instagram') {
+    if (isIgReelUrl(url)) {
+      try {
+        const v = await igGetReelVideo(url);
+        const mp3Path = await convertToMp3(v.videoUrl, v.headers || {});
+        return res.download(mp3Path, generateFileName('instagram', 'mp3'), () => fs.unlink(mp3Path, () => {}));
+      } catch (err) {
+        console.error('[social/mp3/instagram] reel gagal:', err.message);
+        return res.status(500).json({ error: 'Gagal mengonversi audio Reel: ' + String(err.message).slice(0, 200) });
+      }
+    }
+
     try {
       const data = await cobaltFetch(url);
       let videoUrl = data.url;

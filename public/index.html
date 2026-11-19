@@ -185,6 +185,12 @@
           </svg></span>
         <span class="nav-label">Kompres PDF</span>
       </button>
+      <button data-id="imgresize">
+        <span class="nav-icon "><svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8l4-4M12 4h4v4M8 12l-4 4M8 16H4v-4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg></span>
+        <span class="nav-label">Resize Image</span>
+      </button>
     </nav>
   </div>
 
@@ -227,6 +233,24 @@
             <path d="M11.5 3.5l-3 13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
           </svg></span>
         <span class="nav-label">Encode / Decode</span>
+      </button>
+      <button data-id="passgen">
+        <span class="nav-icon "><svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="9" width="13" height="8" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="13" r="1.1" fill="currentColor"/>
+          </svg></span>
+        <span class="nav-label">Password Generator</span>
+      </button>
+      <button data-id="colorgen">
+        <span class="nav-icon "><svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2.5a7.5 7.5 0 1 0 0 15c1.2 0 1.7-.8 1.3-1.7-.4-.9.1-1.8 1.1-1.8H14a3.5 3.5 0 0 0 3.5-3.5C17.5 5.8 14.1 2.5 10 2.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.4" cy="9" r=".9" fill="currentColor"/><circle cx="9" cy="6" r=".9" fill="currentColor"/><circle cx="12.6" cy="6.6" r=".9" fill="currentColor"/>
+          </svg></span>
+        <span class="nav-label">Color Palette</span>
+      </button>
+      <button data-id="texttools">
+        <span class="nav-icon "><svg viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 5h14M3 10h9M3 15h12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg></span>
+        <span class="nav-label">Text Tools</span>
       </button>
     </nav>
   </div>
@@ -698,13 +722,15 @@
   <section class="panel" id="panel-fontgen">
     <div class="panel-header">
       <h2>Font Generator</h2>
-      <p class="desc">Tulis teks di bawah, langsung berubah jadi berbagai gaya font aesthetic. Tinggal klik "Salin" buat dipakai di bio, caption, atau nickname.</p>
+      <p class="desc">Tulis teks di bawah, langsung berubah jadi 150+ gaya font aesthetic dan cute. Klik "Salin" buat dipakai di bio, caption, atau nickname. Simpan gaya favoritmu dengan ★.</p>
     </div>
     <div class="card">
       <label for="fontgen-input">Tulis Teks</label>
       <div class="input-clear-wrap">
         <input type="text" id="fontgen-input" placeholder="Contoh: Tools Dapxz" autocomplete="off" oninput="renderFontGenResults()" />
       </div>
+      <div id="fontgen-filters" class="fontgen-filters"></div>
+      <div id="fontgen-count" class="hint"></div>
       <div id="fontgen-results" class="fontgen-results"></div>
     </div>
   </section>
@@ -787,9 +813,189 @@
     </div>
   </section>
 
+  <section class="panel" id="panel-passgen">
+    <div class="panel-header">
+      <h2>Password Generator</h2>
+      <p class="desc">Buat password acak yang kuat. Dibuat langsung di browser kamu dan tidak dikirim ke server mana pun.</p>
+    </div>
+    <div class="card">
+      <label for="pg-output">Password</label>
+      <div class="pg-output-row">
+        <input type="text" id="pg-output" readonly spellcheck="false" />
+        <button type="button" class="ghost" id="pg-copy">Salin</button>
+        <button type="button" class="action" id="pg-regen">Buat Baru</button>
+      </div>
+      <div class="strength">
+        <div class="strength-bar"><span id="pg-strength-fill"></span></div>
+        <span class="hint" id="pg-strength-text"></span>
+      </div>
+
+      <div class="field spaced">
+        <label for="pg-length">Panjang: <span id="pg-len-label">16</span> karakter</label>
+        <input type="range" id="pg-length" min="8" max="64" value="16" step="1" />
+      </div>
+      <div class="chk-grid">
+        <label class="chk"><input type="checkbox" id="pg-upper" checked /> Huruf besar (A-Z)</label>
+        <label class="chk"><input type="checkbox" id="pg-lower" checked /> Huruf kecil (a-z)</label>
+        <label class="chk"><input type="checkbox" id="pg-digits" checked /> Angka (0-9)</label>
+        <label class="chk"><input type="checkbox" id="pg-symbols" checked /> Simbol (!@#$%)</label>
+        <label class="chk"><input type="checkbox" id="pg-ambig" /> Hindari karakter mirip (0 O 1 l I)</label>
+      </div>
+      <div id="pg-status" class="hint"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-texttools">
+    <div class="panel-header">
+      <h2>Text Tools</h2>
+      <p class="desc">Hitung karakter, kata, kalimat, dan waktu baca. Ubah huruf besar/kecil, rapikan teks, dan ubah gaya penulisan dalam sekali klik.</p>
+    </div>
+    <div class="card">
+      <label for="tt-input">Teks</label>
+      <textarea id="tt-input" rows="8" placeholder="Tulis atau tempel teks di sini..."></textarea>
+
+      <div class="stat-grid">
+        <div class="stat"><strong id="tt-chars">0</strong><span>Karakter</span></div>
+        <div class="stat"><strong id="tt-chars-ns">0</strong><span>Tanpa spasi</span></div>
+        <div class="stat"><strong id="tt-words">0</strong><span>Kata</span></div>
+        <div class="stat"><strong id="tt-sentences">0</strong><span>Kalimat</span></div>
+        <div class="stat"><strong id="tt-paragraphs">0</strong><span>Paragraf</span></div>
+        <div class="stat"><strong id="tt-read">0 mnt</strong><span>Waktu baca</span></div>
+      </div>
+
+      <label>Ubah huruf</label>
+      <div class="tt-actions">
+        <button type="button" class="ghost small" data-tt="upper">HURUF BESAR</button>
+        <button type="button" class="ghost small" data-tt="lower">huruf kecil</button>
+        <button type="button" class="ghost small" data-tt="title">Huruf Awal Besar</button>
+        <button type="button" class="ghost small" data-tt="sentence">Kalimat biasa</button>
+        <button type="button" class="ghost small" data-tt="camel">camelCase</button>
+        <button type="button" class="ghost small" data-tt="snake">snake_case</button>
+        <button type="button" class="ghost small" data-tt="kebab">kebab-case</button>
+      </div>
+      <label style="margin-top:16px;">Rapikan</label>
+      <div class="tt-actions">
+        <button type="button" class="ghost small" data-tt="spaces">Hapus spasi berlebih</button>
+        <button type="button" class="ghost small" data-tt="blank">Hapus baris kosong</button>
+        <button type="button" class="ghost small" data-tt="uniq">Hapus baris duplikat</button>
+        <button type="button" class="ghost small" data-tt="sort">Urutkan baris A-Z</button>
+        <button type="button" class="ghost small" data-tt="reverse">Balik teks</button>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="action" data-tt="copy">Salin Teks</button>
+        <button type="button" class="ghost" data-tt="undo">Urungkan</button>
+        <button type="button" class="ghost" data-tt="clear">Kosongkan</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-colorgen">
+    <div class="panel-header">
+      <h2>Color Palette</h2>
+      <p class="desc">Pilih satu warna, dapatkan palet yang serasi beserta kode gradient CSS-nya. Klik warna untuk menyalin kode HEX.</p>
+    </div>
+    <div class="card">
+      <div class="grid">
+        <div class="field">
+          <label for="cg-base">Warna dasar</label>
+          <input type="color" id="cg-base" value="#5aa2ff" />
+        </div>
+        <div class="field">
+          <label for="cg-hex">Kode HEX</label>
+          <input type="text" id="cg-hex" value="#5aa2ff" maxlength="7" spellcheck="false" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="cg-harmony">Jenis palet</label>
+          <select id="cg-harmony">
+            <option value="pastel">Pastel (cute)</option>
+            <option value="complementary">Komplementer</option>
+            <option value="analogous">Analogus</option>
+            <option value="triadic">Triadik</option>
+            <option value="tetradic">Tetradik</option>
+            <option value="split">Split-komplementer</option>
+            <option value="mono">Monokrom</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="action" id="cg-random">Warna Acak</button>
+        <button type="button" class="ghost" id="cg-copy-all">Salin Semua HEX</button>
+      </div>
+
+      <div id="cg-swatches" class="swatches"></div>
+
+      <div class="field spaced">
+        <label for="cg-angle">Gradient: arah <span id="cg-angle-label">90°</span></label>
+        <input type="range" id="cg-angle" min="0" max="360" value="90" step="5" />
+      </div>
+      <div id="cg-gradient" class="gradient-preview"></div>
+      <div class="pg-output-row" style="margin-top:12px;">
+        <input type="text" id="cg-css" readonly spellcheck="false" />
+        <button type="button" class="ghost" id="cg-copy-css">Salin CSS</button>
+      </div>
+      <div id="cg-status" class="hint"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-imgresize">
+    <div class="panel-header">
+      <h2>Resize Image</h2>
+      <p class="desc">Ubah ukuran gambar ke lebar dan tinggi yang kamu mau (dalam piksel). Diproses di browser, gambar tidak diupload ke server.</p>
+    </div>
+    <div class="card">
+      <div class="filebox" onclick="document.getElementById('ir-file').click()">
+        <input type="file" id="ir-file" accept="image/*" />
+        <span id="ir-file-label">Klik untuk pilih gambar (PNG / JPG / WEBP)</span>
+      </div>
+      <div id="ir-info" class="hint" style="margin-top:0;"></div>
+
+      <div id="ir-options" style="display:none;">
+        <div class="grid">
+          <div class="field">
+            <label for="ir-w">Lebar (px)</label>
+            <input type="number" id="ir-w" min="1" max="8000" />
+          </div>
+          <div class="field">
+            <label for="ir-h">Tinggi (px)</label>
+            <input type="number" id="ir-h" min="1" max="8000" />
+          </div>
+        </div>
+        <label class="chk" style="margin-bottom:14px;"><input type="checkbox" id="ir-lock" checked /> Kunci rasio (tinggi menyesuaikan otomatis)</label>
+        <div class="tt-actions" style="margin-bottom:16px;">
+          <button type="button" class="ghost small" data-pct="25">25%</button>
+          <button type="button" class="ghost small" data-pct="50">50%</button>
+          <button type="button" class="ghost small" data-pct="75">75%</button>
+          <button type="button" class="ghost small" data-width="1920">Lebar 1920</button>
+          <button type="button" class="ghost small" data-width="1080">Lebar 1080</button>
+          <button type="button" class="ghost small" data-width="512">Lebar 512</button>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label for="ir-format">Format output</label>
+            <select id="ir-format">
+              <option value="image/png">PNG</option>
+              <option value="image/jpeg">JPG</option>
+              <option value="image/webp">WEBP</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="ir-quality">Kualitas: <span id="ir-quality-label">90%</span></label>
+            <input type="range" id="ir-quality" min="10" max="100" value="90" step="5" />
+          </div>
+        </div>
+        <button type="button" class="action" id="ir-btn">Resize</button>
+      </div>
+      <div id="ir-status" class="hint"></div>
+      <div id="ir-result" class="ir-result"></div>
+      <p class="note">Catatan: kualitas hanya berpengaruh untuk JPG dan WEBP. Format PNG bersifat lossless.</p>
+    </div>
+  </section>
+
 </main>
 
-<script src="script.js" defer></script>
-<script src="home.js" defer></script>
+<script src="script.js?v=2" defer></script>
+<script src="fontgen.js?v=2" defer></script>
+<script src="tools-extra.js?v=2" defer></script>
+<script src="home.js?v=2" defer></script>
 </body>
 </html>

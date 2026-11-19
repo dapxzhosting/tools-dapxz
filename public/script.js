@@ -84,10 +84,18 @@ function handleEnterKey(event, callback) {
     callback();
   }
 }
+// "Failed to fetch" = koneksi ke server putus/timeout/server restart (pesan beda tiap browser)
+const NETWORK_ERROR_RE = /failed to fetch|networkerror when attempting to fetch|load failed|network request failed/i;
+const NETWORK_ERROR_MSG = '⚠️ Koneksi ke server terputus. Coba refresh halaman, lalu download lagi.';
+function friendlyError(message) {
+  return NETWORK_ERROR_RE.test(String(message || '')) ? NETWORK_ERROR_MSG : message;
+}
+
 function setStatus(id, message, type = '') {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = message || '';
+  const msg = type === 'error' ? friendlyError(message) : message;
+  el.textContent = msg || '';
   el.className = 'hint' + (type ? ` hint-${type}` : '');
 }
 async function downloadResponseAsFile(resp, fallbackName) {
@@ -211,7 +219,7 @@ async function fetchAndRenderImagePreviews(platform, url) {
 
     setStatus(`${platform}-status`, `${data.images.length} media siap didownload.`, 'success');
   } catch (err) {
-    previewContainer.innerHTML = `<div class="hint hint-error">${escapeHtml(err.message)}</div>`;
+    previewContainer.innerHTML = `<div class="hint hint-error">${escapeHtml(friendlyError(err.message))}</div>`;
     setStatus(`${platform}-status`, err.message, 'error');
   }
 }
@@ -1308,71 +1316,6 @@ function fontgenStrikethrough(text) {
 }
 function fontgenUnderline(text) {
   return Array.from(text).map((ch) => ch + '\u0332').join('');
-}
-
-const FONTGEN_STYLES = [
-  { label: 'Bold', fn: (t) => fontgenOffsetMap(t, 0x1D400, 0x1D41A, 0x1D7CE) },
-  { label: 'Italic', fn: (t) => fontgenOffsetMap(t, 0x1D434, 0x1D44E, null, 'italic') },
-  { label: 'Bold Italic', fn: (t) => fontgenOffsetMap(t, 0x1D468, 0x1D482, null) },
-  { label: 'Script', fn: (t) => fontgenOffsetMap(t, 0x1D49C, 0x1D4B6, null, 'script') },
-  { label: 'Bold Script', fn: (t) => fontgenOffsetMap(t, 0x1D4D0, 0x1D4EA, null) },
-  { label: 'Fraktur / Gothic', fn: (t) => fontgenOffsetMap(t, 0x1D504, 0x1D51E, null, 'fraktur') },
-  { label: 'Bold Fraktur', fn: (t) => fontgenOffsetMap(t, 0x1D56C, 0x1D586, null) },
-  { label: 'Double-Struck', fn: (t) => fontgenOffsetMap(t, 0x1D538, 0x1D552, 0x1D7D8, 'doublestruck') },
-  { label: 'Sans-Serif', fn: (t) => fontgenOffsetMap(t, 0x1D5A0, 0x1D5BA, 0x1D7E2) },
-  { label: 'Sans-Serif Bold', fn: (t) => fontgenOffsetMap(t, 0x1D5D4, 0x1D5EE, 0x1D7EC) },
-  { label: 'Sans-Serif Italic', fn: (t) => fontgenOffsetMap(t, 0x1D608, 0x1D622, null) },
-  { label: 'Sans-Serif Bold Italic', fn: (t) => fontgenOffsetMap(t, 0x1D63C, 0x1D656, null) },
-  { label: 'Monospace', fn: (t) => fontgenOffsetMap(t, 0x1D670, 0x1D68A, 0x1D7F6) },
-  { label: 'Fullwidth', fn: fontgenFullwidth },
-  { label: 'Bubble (Circled)', fn: fontgenCircled },
-  { label: 'Bubble Solid', fn: fontgenCircledNegative },
-  { label: 'Squared', fn: fontgenSquared },
-  { label: 'Small Caps', fn: fontgenSmallCaps },
-  { label: 'Upside Down', fn: fontgenUpsideDown },
-  { label: 'Strikethrough', fn: fontgenStrikethrough },
-  { label: 'Underline', fn: fontgenUnderline },
-  { label: 'Wide Spaced', fn: (t) => Array.from(t).join(' ') },
-  { label: 'Cute Heart ♡', fn: (t) => `♡ ${t} ♡` },
-  { label: 'Kawaii Sparkle', fn: (t) => `✧･ﾟ: *✧･ﾟ:* ${t} *:･ﾟ✧*:･ﾟ✧` },
-  { label: 'Soft Stars', fn: (t) => `⋆｡°✩ ${t} ✩°｡⋆` },
-  { label: 'Bunga', fn: (t) => `✿ ${t} ✿` },
-  { label: 'Bracket Jepang', fn: (t) => `「${t}」` },
-  { label: 'Bracket Jepang Ganda', fn: (t) => `『${t}』` },
-  { label: 'Bintang Anime', fn: (t) => `☆*: .｡. ${t} .｡.:*☆` },
-  { label: 'Kaomoji Cute', fn: (t) => `(｡♥‿♥｡) ${t} (｡♥‿♥｡)` },
-  { label: 'Pita Cute', fn: (t) => `((( ${t} )))` },
-  { label: 'Bubble + Hati', fn: (t) => `♡${fontgenCircled(t)}♡` },
-  { label: 'Cute Cursive', fn: (t) => `~*${fontgenOffsetMap(t, 0x1D4D0, 0x1D4EA, null)}*~` },
-];
-
-function renderFontGenResults() {
-  const text = document.getElementById('fontgen-input')?.value;
-  const container = document.getElementById('fontgen-results');
-  if (!container) return;
-
-  if (!text) {
-    container.innerHTML = '';
-    return;
-  }
-
-  container.innerHTML = FONTGEN_STYLES.map((style, idx) => {
-    let output = '';
-    try {
-      output = style.fn(text);
-    } catch {
-      output = text;
-    }
-    return `
-      <div class="fontgen-row">
-        <div class="fontgen-row-text">
-          <div class="hint" style="margin-bottom:2px;">${escapeHtml(style.label)}</div>
-          <div class="fontgen-output" id="fontgen-output-${idx}">${escapeHtml(output)}</div>
-        </div>
-        <button class="ghost fontgen-copy-btn" onclick="copyFontGenResult(${idx}, this)">Salin</button>
-      </div>
-    `;
-  }).join('');
 }
 
 const SIGNATURE_FONTS = [
