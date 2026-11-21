@@ -20,7 +20,7 @@
     pdf2img: 'Setiap halaman jadi PNG',
     pdfcompress: 'Kecilkan ukuran file PDF',
     qrgen: 'QR kustom dengan logo',
-    fontgen: '150+ gaya teks aesthetic & cute',
+    fontgen: '100+ gaya font aesthetic & cute',
     siggen: 'Tanda tangan digital PNG',
     endec: 'Base64, URL, Hex, dan lainnya',
     passgen: 'Password acak yang kuat & aman',

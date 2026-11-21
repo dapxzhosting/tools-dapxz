@@ -1,5 +1,5 @@
 /* =========================================================
-   fontgen.js | Font Generator 100+ gaya (cute, huruf unik, efek, hiasan)
+   fontgen.js | Font Generator 100+ gaya (HURUF SAJA, tanpa emoji / hiasan)
    Dimuat SETELAH script.js (memakai helper fontgen* di sana).
    Fitur: filter kategori, favorit (disimpan di browser), contoh teks otomatis.
    ========================================================= */
@@ -43,176 +43,106 @@
   const sansBoldItalic = (t) => fontgenOffsetMap(t, 0x1D63C, 0x1D656, null);
   const mono = (t) => fontgenOffsetMap(t, 0x1D670, 0x1D68A, 0x1D7F6);
 
-  const CANADIAN = 'ᗩᗷᑕᗪEᖴGᕼIᒍKᒪᗰᑎOᑭᑫᖇᔕTᑌᐯᗯᕽYᘔ';
-  const AESTHETIC = 'αв¢∂єƒgнιנкℓмησρqяѕтυνωχуz';
-  const SUPER_U = 'ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻ';
-  const SUPER_L = 'ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ';
-  const SUB_L = 'ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz';
+  // ---------- alfabet tambahan (semua 26 huruf, dicek saat uji) ----------
+  const MAPS = {
+    canadian: 'ᗩᗷᑕᗪEᖴGᕼIᒍKᒪᗰᑎOᑭᑫᖇᔕTᑌᐯᗯᕽYᘔ',
+    japanese: 'ﾑ乃ᄃり乇ｷム卄丨ﾌҜㄥ爪几ㄖ卩Ɋ尺丂ㄒㄩᐯ山乂ㄚ乙',
+    greek: 'ΛβCDΣFGΗIJKLMNΘPQЯSΤUVWXΨZ',
+    cyrillic: 'ДБСDЄFGНІЈКLМИОPQЯЅТЦVШЖЧZ',
+    accent: 'ÀßÇÐÈƑGĤÌJKĽMÑÖPQŖŞŤÛVŴXŸŹ',
+    currency: ['₳', '฿', '₵', 'Đ', 'Ɇ', '₣', '₲', 'Ⱨ', 'ł', 'J', '₭', 'Ⱡ', '₥', '₦', 'Ø', '₱', 'Q', 'Ɽ', '₴', '₮', 'Ʉ', 'V', '₩', 'Ӿ', 'Ɏ', 'Ⱬ'].join(''),
+    // huruf kecil
+    aesthetic: 'αв¢∂єƒgнιנкℓмησρqяѕтυνωχуz',
+    tiny: 'ǟɮƈɖɛʄɢɦɨʝӄʟʍռօքզʀֆȶʊʋաӼʏʐ',
+    armenian: 'ąცƈɖҽƒցԋιʝƙʅɱղօρգɾʂƚυʋɯxყȥ',
+    superU: 'ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻ',
+    superL: 'ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ',
+    subL: 'ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz',
+  };
   const PAREN = cpRange(0x249C);   // ⒜⒝⒞
   const NEG_SQ = cpRange(0x1F170); // 🅰🅱🅲
+  const upperFont = (m) => (t) => strMap(t.toUpperCase(), m, m);
+  const lowerFont = (m) => (t) => strMap(t.toLowerCase(), '', m);
 
-  // [label, kategori, fungsi]
+  // ---------- daftar gaya ----------
+  // cat: 'unik' (huruf) | 'garis' (huruf + garis/coret); cute: tampil di filter "Cute"
   const STYLES = [];
-  const add = (label, cat, fn) => STYLES.push({ label, cat, fn });
+  const add = (label, cat, fn, cute) => STYLES.push({ label, cat, fn, cute: !!cute });
 
-  // ===== Huruf Unik =====
+  // ===== Huruf Unik: alfabet Unicode =====
   add('Bold', 'unik', bold);
   add('Italic', 'unik', italic);
   add('Bold Italic', 'unik', boldItalic);
-  add('Script', 'unik', script);
-  add('Bold Script', 'unik', boldScript);
+  add('Script', 'unik', script, true);
+  add('Bold Script', 'unik', boldScript, true);
   add('Fraktur / Gothic', 'unik', fraktur);
   add('Bold Fraktur', 'unik', boldFraktur);
-  add('Double-Struck', 'unik', doubleStruck);
+  add('Double-Struck', 'unik', doubleStruck, true);
   add('Sans-Serif', 'unik', sans);
   add('Sans-Serif Bold', 'unik', sansBold);
   add('Sans-Serif Italic', 'unik', sansItalic);
   add('Sans-Serif Bold Italic', 'unik', sansBoldItalic);
   add('Monospace', 'unik', mono);
   add('Fullwidth', 'unik', (t) => fontgenFullwidth(t));
-  add('Bubble (Circled)', 'unik', (t) => fontgenCircled(t));
-  add('Bubble Solid', 'unik', (t) => fontgenCircledNegative(t));
+  add('Bubble (Circled)', 'unik', (t) => fontgenCircled(t), true);
+  add('Bubble Solid', 'unik', (t) => fontgenCircledNegative(t), true);
   add('Squared', 'unik', (t) => fontgenSquared(t));
-  add('Squared Solid', 'unik', (t) => strMap(t.toUpperCase(), NEG_SQ, NEG_SQ));
-  add('Small Caps', 'unik', (t) => fontgenSmallCaps(t));
+  add('Squared Solid', 'unik', upperFont(NEG_SQ));
+  add('Kurung ⒜⒝⒞', 'unik', lowerFont(PAREN), true);
+  add('Small Caps', 'unik', (t) => fontgenSmallCaps(t), true);
   add('Upside Down', 'unik', (t) => fontgenUpsideDown(t));
-  add('Superscript ᵗᵒᵒˡˢ', 'unik', (t) => strMap(t, SUPER_U, SUPER_L, '⁰¹²³⁴⁵⁶⁷⁸⁹'));
-  add('Subscript ₜₒₒₗₛ', 'unik', (t) => strMap(t.toLowerCase(), '', SUB_L, '₀₁₂₃₄₅₆₇₈₉'));
-  add('Canadian ᗩᗷᑕ', 'unik', (t) => strMap(t.toUpperCase(), CANADIAN, CANADIAN));
-  add('Aesthetic αв¢∂', 'unik', (t) => strMap(t.toLowerCase(), '', AESTHETIC));
-  add('Kurung ⒜⒝⒞', 'unik', (t) => strMap(t.toLowerCase(), '', PAREN));
+  add('Superscript ᵗᵒᵒˡˢ', 'unik', (t) => strMap(t, MAPS.superU, MAPS.superL, '⁰¹²³⁴⁵⁶⁷⁸⁹'), true);
+  add('Subscript ₜₒₒₗₛ', 'unik', (t) => strMap(t.toLowerCase(), '', MAPS.subL, '₀₁₂₃₄₅₆₇₈₉'));
+  add('Canadian ᗩᗷᑕ', 'unik', upperFont(MAPS.canadian), true);
+  add('Aesthetic αв¢∂', 'unik', lowerFont(MAPS.aesthetic), true);
+  add('Tiny ǟɮƈ', 'unik', lowerFont(MAPS.tiny), true);
+  add('Armenian ąცƈ', 'unik', lowerFont(MAPS.armenian), true);
+  add('Japanese ﾑ乃ᄃ', 'unik', upperFont(MAPS.japanese));
+  add('Greek ΛβC', 'unik', upperFont(MAPS.greek));
+  add('Cyrillic ДБС', 'unik', upperFont(MAPS.cyrillic));
+  add('Aksen ÀßÇ', 'unik', upperFont(MAPS.accent));
+  add('Currency ₳฿₵', 'unik', upperFont(MAPS.currency));
+
+  // ===== Huruf Unik: pengaturan huruf biasa =====
   add('Spasi Lebar', 'unik', (t) => Array.from(t).join(' '));
   add('HURUF BESAR', 'unik', (t) => t.toUpperCase());
   add('huruf kecil semua', 'unik', (t) => t.toLowerCase());
   add('Huruf Awal Besar', 'unik', titleCase);
   add('aLtErNaTiNg', 'unik', alt);
 
-  // ===== Efek garis / tanda =====
-  add('Coret', 'efek', (t) => fontgenStrikethrough(t));
-  add('Garis Bawah', 'efek', (t) => fontgenUnderline(t));
-  add('Garis Bawah Ganda', 'efek', mark('\u0333'));
-  add('Garis Atas', 'efek', mark('\u0305'));
-  add('Garis Atas Ganda', 'efek', mark('\u033F'));
-  add('Garis Miring', 'efek', mark('\u0338'));
-  add('Coret Pendek', 'efek', mark('\u0335'));
-  add('Coret Gelombang', 'efek', mark('\u0334'));
-  add('Titik Bawah', 'efek', mark('\u0323'));
-  add('Titik Atas', 'efek', mark('\u0307'));
-  add('Cincin Atas', 'efek', mark('\u030A'));
-  add('Umlaut', 'efek', mark('\u0308'));
-  add('Tanda X Atas', 'efek', mark('\u033D'));
-  add('Bintang Bawah', 'efek', mark('\u0359'));
-  add('Gelombang Atas', 'efek', mark('\u0303'));
-  add('Jembatan Bawah', 'efek', mark('\u032A'));
-
-  // ===== Cute: pemisah antar huruf =====
-  ['♡', '✿', '✧', '★', '☆', '⋆', '˚', '♪', '❀', '❥', '☾', '✦', '♥', '❁', '~', '·', '₊', '🌸', '💖', '✨']
-    .forEach((s) => add(`Pemisah ${s}`, 'cute', sep(s)));
-
-  // ===== Cute: dibungkus hiasan [label, awalan, akhiran] =====
-  [
-    ['Hati ♡', '♡ ', ' ♡'],
-    ['Hati Dobel ♡♡', '♡♡ ', ' ♡♡'],
-    ['Hati Penuh ♥', '♥ ', ' ♥'],
-    ['Hati Pink 💗', '💗 ', ' 💗'],
-    ['Panah Hati ❥', '❥ ', ' ❥'],
-    ['Bunga ✿', '✿ ', ' ✿'],
-    ['Kuntum ❀', '❀ ', ' ❀'],
-    ['Sakura 🌸', '🌸 ', ' 🌸'],
-    ['Tulip 🌷', '🌷 ', ' 🌷'],
-    ['Sparkle ✨', '✨ ', ' ✨'],
-    ['Bintang ✦', '✦ ', ' ✦'],
-    ['Bintang Soft', '⋆｡°✩ ', ' ✩°｡⋆'],
-    ['Bintang Anime', '☆*: .｡. ', ' .｡.:*☆'],
-    ['Kawaii', '✧･ﾟ: *✧･ﾟ:* ', ' *:･ﾟ✧*:･ﾟ✧'],
-    ['Kilau ･ﾟ✧', '･ﾟ✧ ', ' ✧ﾟ･'],
-    ['Kilau ✧˖°', '✧˖° ', ' °˖✧'],
-    ['Kilau ₊˚', '₊˚ ', ' ˚₊'],
-    ['Bintang Malam', '⋆⁺₊⋆ ☾⋆⁺₊⋆ ', ' ⋆⁺₊⋆ ☽⋆⁺₊⋆'],
-    ['Kupu-kupu 🦋', '🦋 ', ' 🦋'],
-    ['Beruang ʕ•ᴥ•ʔ', 'ʕ•ᴥ•ʔ ', ' ʕ•ᴥ•ʔ'],
-    ['Kucing ฅ^•ﻌ•^ฅ', 'ฅ^•ﻌ•^ฅ ', ' ฅ^•ﻌ•^ฅ'],
-    ['Kucing 🐱', '🐱 ', ' 🐱'],
-    ['Kelinci 🐰', '🐰 ', ' 🐰'],
-    ['Panda 🐼', '🐼 ', ' 🐼'],
-    ['Awan ☁', '☁ ', ' ☁'],
-    ['Bulan ☾', '☾ ', ' ☽'],
-    ['Bulan & Bintang', '☽ ✧ ', ' ✧ ☾'],
-    ['Pelangi 🌈', '🌈 ', ' 🌈'],
-    ['Stroberi 🍓', '🍓 ', ' 🍓'],
-    ['Ceri 🍒', '🍒 ', ' 🍒'],
-    ['Boba 🧋', '🧋 ', ' 🧋'],
-    ['Donat 🍩', '🍩 ', ' 🍩'],
-    ['Es Krim 🍦', '🍦 ', ' 🍦'],
-    ['Pita 🎀', '🎀 ', ' 🎀'],
-    ['Mahkota 👑', '👑 ', ' 👑'],
-    ['Cinta ˗ˏˋ ♡ ˎˊ˗', '˗ˏˋ ♡ ˎˊ˗ ', ' ˗ˏˋ ♡ ˎˊ˗'],
-    ['Not Musik ♪', '♪ ', ' ♪'],
-    ['Musik ♫', '♫ ', ' ♫'],
-    ['Tersenyum ☺', '☺ ', ' ☺'],
-    ['Wajah ᵔᴥᵔ', 'ᵔᴥᵔ ', ' ᵔᴥᵔ'],
-    ['Kaomoji Senang', '(｡♥‿♥｡) ', ' (｡♥‿♥｡)'],
-    ['Kaomoji ٩(◕‿◕｡)۶', '٩(◕‿◕｡)۶ ', ' ٩(◕‿◕｡)۶'],
-    ['Kaomoji Peluk', '( ˘ ³˘)♥ ', ' ♥(˘ ³˘ )'],
-    ['Kaomoji ✧٩(ˊᗜˋ*)و✧', '✧٩(ˊᗜˋ*)و✧ ', ' ✧٩(ˊᗜˋ*)و✧'],
-    ['Kaomoji (ᵔ◡ᵔ)', '(ᵔ◡ᵔ) ', ' (ᵔ◡ᵔ)'],
-    ['UwU', 'UwU ', ' UwU'],
-    ['OwO', 'OwO ', ' OwO'],
-    ['Awalan Hati saja', '♡ ', ''],
-    ['Akhiran Sparkle saja', '', ' ✧'],
-    ['Awalan Bunga saja', '❀ ', ''],
-  ].forEach(([label, a, b]) => add(label, 'cute', wrap(a, b)));
-
-  // ===== Hiasan: kurung & garis =====
-  [
-    ['Kurung Jepang 「」', '「', '」'],
-    ['Kurung Jepang Ganda 『』', '『', '』'],
-    ['Kurung Tebal 【】', '【', '】'],
-    ['Kurung Sudut ⟪⟫', '⟪ ', ' ⟫'],
-    ['Kurung Kecil ₍₎', '₍ ', ' ₎'],
-    ['Kurung Siku ⸢⸥', '⸢', '⸥'],
-    ['Bintang Anime 彡', '★彡 ', ' 彡★'],
-    ['Sayap ꧁༺༻꧂', '꧁༺ ', ' ༻꧂'],
-    ['Garis Bintang', '──── ✦ ', ' ✦ ────'],
-    ['Garis Hati', '—— ♡ ', ' ♡ ——'],
-    ['Garis Titik', '･･･ ', ' ･･･'],
-    ['Tilde ~', '~', '~'],
-    ['Pagar ░', '░▒▓ ', ' ▓▒░'],
-    ['Panah ➤', '➤ ', ' ◄'],
-    ['Segitiga ▶◀', '▶ ', ' ◀'],
-    ['Berlian ◆', '◆ ', ' ◆'],
-    ['Kotak Titik ⁘', '⁘ ', ' ⁘'],
-  ].forEach(([label, a, b]) => add(label, 'hiasan', wrap(a, b)));
-
-  // ===== Cute: kombinasi huruf unik + hiasan =====
-  [
-    ['Bold Script + Bunga', boldScript, '✿ ', ' ✿'],
-    ['Bold Script + Kawaii', boldScript, '✧･ﾟ: *✧･ﾟ:* ', ' *:･ﾟ✧*:･ﾟ✧'],
-    ['Bold Script + Gelombang', boldScript, '~*', '*~'],
-    ['Script + Hati', script, '♡ ', ' ♡'],
-    ['Fullwidth + Sparkle', (t) => fontgenFullwidth(t), '✧ ', ' ✧'],
-    ['Small Caps + Bulan', (t) => fontgenSmallCaps(t), '☾ ', ' ☽'],
-    ['Sans Bold + Bintang', sansBold, '★ ', ' ★'],
-    ['Italic + Not Musik', italic, '♪ ', ' ♪'],
-    ['Double-Struck + Kuntum', doubleStruck, '❀ ', ' ❀'],
-    ['Fraktur + Bulan', fraktur, '☾ ', ' ☽'],
-    ['Monospace + Sparkle', mono, '✦ ', ' ✦'],
-    ['Bubble + Hati', (t) => fontgenCircled(t), '♡', '♡'],
-    ['Bubble Solid + Bintang', (t) => fontgenCircledNegative(t), '☆ ', ' ☆'],
-    ['Bold + Pita', bold, '🎀 ', ' 🎀'],
-    ['Sans + Sakura', sans, '🌸 ', ' 🌸'],
-    ['Superscript + Hati', (t) => strMap(t, SUPER_U, SUPER_L, '⁰¹²³⁴⁵⁶⁷⁸⁹'), '♡ ', ' ♡'],
-    ['Canadian + Kupu-kupu', (t) => strMap(t.toUpperCase(), CANADIAN, CANADIAN), '🦋 ', ' 🦋'],
-    ['Aesthetic + Kilau', (t) => strMap(t.toLowerCase(), '', AESTHETIC), '₊˚ ', ' ˚₊'],
-  ].forEach(([label, font, a, b]) => add(label, 'cute', wrapWith(font, a, b)));
+  // ===== Garis & Coret: huruf polos + 12 gaya huruf, masing-masing x 6 efek garis =====
+  const LINES = [
+    ['Coret', '\u0336'],
+    ['Garis Bawah', '\u0332'],
+    ['Garis Bawah Ganda', '\u0333'],
+    ['Garis Atas', '\u0305'],
+    ['Titik Bawah', '\u0323'],
+    ['Garis Miring', '\u0338'],
+  ];
+  const LINE_BASES = [
+    ['Bold', bold],
+    ['Italic', italic],
+    ['Bold Italic', boldItalic],
+    ['Script', script],
+    ['Bold Script', boldScript],
+    ['Fraktur', fraktur],
+    ['Double-Struck', doubleStruck],
+    ['Sans Bold', sansBold],
+    ['Monospace', mono],
+    ['Small Caps', (t) => fontgenSmallCaps(t)],
+    ['Fullwidth', (t) => fontgenFullwidth(t)],
+    ['Aesthetic', lowerFont(MAPS.aesthetic)],
+  ];
+  LINES.forEach(([name, m]) => add(name, 'garis', mark(m)));
+  LINE_BASES.forEach(([base, font]) => {
+    LINES.forEach(([name, m]) => add(`${base} + ${name}`, 'garis', (t) => mark(m)(font(t))));
+  });
 
   const FILTERS = [
-    { id: 'all', label: 'Semua' },
-    { id: 'cute', label: 'Cute ✿' },
-    { id: 'unik', label: 'Huruf Unik' },
-    { id: 'efek', label: 'Efek' },
-    { id: 'hiasan', label: 'Hiasan' },
-    { id: 'fav', label: '★ Favorit' },
+    { id: 'all', label: 'Semua', test: () => true },
+    { id: 'cute', label: 'Cute', test: (st) => st.cute },
+    { id: 'unik', label: 'Huruf Unik', test: (st) => st.cat === 'unik' },
+    { id: 'garis', label: 'Garis & Coret', test: (st) => st.cat === 'garis' },
   ];
 
   let filter = 'all';
@@ -230,11 +160,13 @@
   function buildFilters() {
     const wrapEl = document.getElementById('fontgen-filters');
     if (!wrapEl) return;
-    const favCount = loadFavs().size;
-    wrapEl.innerHTML = FILTERS.map((f) => {
-      const n = f.id === 'all' ? STYLES.length : f.id === 'fav' ? favCount : STYLES.filter((s) => s.cat === f.id).length;
-      return `<button type="button" class="chip${f.id === filter ? ' active' : ''}" data-f="${f.id}">${f.label} (${n})</button>`;
-    }).join('');
+    const favs = loadFavs();
+    const favCount = STYLES.filter((st) => favs.has(st.label)).length;
+    const all = FILTERS.map((f) => ({ id: f.id, label: f.label, n: STYLES.filter(f.test).length }))
+      .concat([{ id: 'fav', label: '★ Favorit', n: favCount }]);
+    wrapEl.innerHTML = all.map((f) => (
+      `<button type="button" class="chip${f.id === filter ? ' active' : ''}" data-f="${f.id}">${f.label} (${f.n})</button>`
+    )).join('');
     wrapEl.onclick = (e) => {
       const b = e.target.closest('[data-f]');
       if (!b) return;
@@ -253,7 +185,8 @@
     const text = isSample ? SAMPLE : raw;
     const favs = loadFavs();
 
-    visible = STYLES.filter((s) => filter === 'all' || (filter === 'fav' ? favs.has(s.label) : s.cat === filter));
+    const f = FILTERS.find((x) => x.id === filter);
+    visible = STYLES.filter((st) => (filter === 'fav' ? favs.has(st.label) : (f ? f.test(st) : true)));
 
     const info = document.getElementById('fontgen-count');
     if (info) {
